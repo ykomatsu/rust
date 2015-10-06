@@ -65,7 +65,7 @@ ERR_IDX_GEN = $(RPATH_VAR2_T_$(CFG_BUILD)_H_$(CFG_BUILD)) $(ERR_IDX_GEN_EXE)
 
 D := $(S)src/doc
 
-DOC_TARGETS := trpl nomicon style error-index
+DOC_TARGETS := trpl trpl-ja nomicon style error-index
 COMPILER_DOC_TARGETS :=
 DOC_L10N_TARGETS :=
 
@@ -200,6 +200,13 @@ doc/book/index.html: $(RUSTBOOK_EXE) $(wildcard $(S)/src/doc/trpl/*.md) | doc/
 	@$(call E, rustbook: $@)
 	$(Q)rm -rf doc/book
 	$(Q)$(RUSTBOOK) build $(S)src/doc/trpl doc/book
+
+trpl-ja: doc/book-ja/index.html
+
+doc/book-ja/index.html: $(RUSTBOOK_EXE) $(wildcard $(S)/src/doc/trpl-ja/*.md) | doc/
+	@$(call E, rustbook: $@)
+	$(Q)rm -rf doc/book-ja
+	$(Q)$(RUSTBOOK) build $(S)src/doc/trpl-ja doc/book-ja
 
 nomicon: doc/nomicon/index.html
 
