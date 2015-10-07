@@ -1,10 +1,7 @@
-% Syntax and Semantics
+% 構文と意味
 
-This section breaks Rust down into small chunks, one for each concept.
+このセクションではRustを概念ごとに小さな塊に分解します。
 
-If you’d like to learn Rust from the bottom up, reading this in order is a
-great way to do that.
+もし、ボトムアップでRustを学びたいのであれば、これを順番に読むのがそのために最適な方法です。
 
-These sections also form a reference for each concept, so if you’re reading
-another tutorial and find something confusing, you can find it explained
-somewhere in here.
+これらのセクションはそれぞれの概念のリファレンスの形式にもなっているので、もし、他のチュートリアルを読んでいて何か分からないことがあれば、ここのどこかでそれについての説明を見付けられるはずです。

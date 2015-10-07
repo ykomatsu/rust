@@ -1,5 +1,6 @@
-% Getting Started
+% 始めましょう
 
-This first section of the book will get you going with Rust and its tooling.
-First, we’ll install Rust. Then, the classic ‘Hello World’ program. Finally,
-we’ll talk about Cargo, Rust’s build system and package manager.
+本書のこの最初のセクションでは、Rustとそのツールに慣れることができるでしょう。
+まず、Rustをインストールします。
+そして、伝統的な‘Hello World’プログラムを書きます。
+最後に、Rustのビルドシステム兼パッケージマネージャーであるCargoについて説明します。

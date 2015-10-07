@@ -1,8 +1,8 @@
 % Effective Rust
 
-So you’ve learned how to write some Rust code. But there’s a difference between
-writing *any* Rust code and writing *good* Rust code.
+さて、Rustのコードをどうやって書くのかは学びました。
+しかし、*何らかの*Rustのコードを書くということと*よい*Rustのコードを書くということとの間には差があります。
 
-This section consists of relatively independent tutorials which show you how to
-take your Rust to the next level. Common patterns and standard library features
-will be introduced. Read these sections in any order of your choosing.
+このセクションはあなたのRustを次のレベルに引き上げる方法を示す、どちらかと言えば独立したチュートリアルで構成されています。
+一般的なパターンや標準ライブラリーの機能が紹介されることでしょう。
+これらのセクションを好きな順番で読みましょう。
