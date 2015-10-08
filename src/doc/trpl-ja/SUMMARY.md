@@ -9,7 +9,7 @@
     * [Dining Philosophers](dining-philosophers.md)
     * [Rust Inside Other Languages](rust-inside-other-languages.md)
 * [Effective Rust](effective-rust.md)
-    * [The Stack and the Heap](the-stack-and-the-heap.md)
+    * [スタックとヒープ](the-stack-and-the-heap.md)
     * [Testing](testing.md)
     * [Conditional Compilation](conditional-compilation.md)
     * [Documentation](documentation.md)

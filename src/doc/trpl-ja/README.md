@@ -1,30 +1,26 @@
-% The Rust Programming Language
+% プログラミング言語Rust
 
-Welcome! This book will teach you about the [Rust Programming Language][rust].
-Rust is a systems programming language focused on three goals: safety, speed,
-and concurrency. It maintains these goals without having a garbage collector,
-making it a useful language for a number of use cases other languages aren’t
-good at: embedding in other languages, programs with specific space and time
-requirements, and writing low-level code, like device drivers and operating
-systems. It improves on current languages targeting this space by having a
-number of compile-time safety checks that produce no runtime overhead, while
-eliminating all data races. Rust also aims to achieve ‘zero-cost abstractions’
-even though some of these abstractions feel like those of a high-level
-language. Even then, Rust still allows precise control like a low-level
-language would.
+ようこそ！
+本書ではあなたに[プログラミング言語Rust][rust]をお教えします。
+Rustは安全性、速度、そして並行性という3つのゴールに焦点を合わせたシステムプログラミング言語です。
+Rustはこれらのゴールをガベージコレクターなしで維持していて、他言語が得意でない多くの利用場面、例えば、他言語への組込み、限定されたスペースや時間で動かなくてはならないプログラム、そしてデバイスドライバーやオペレーティングシステムのような低レベルのコードの記述において便利な言語になっています。
+Rustは、この領域を対象とする現在の言語を、実行時にオーバーヘッドを生じずにたくさんのコンパイル時の安全性チェックを行うことと同時に全てのデータ競合を削除することで改善しています。
+Rustはまた、「0コストの抽象化」を実現することも目標としています。それらの抽象化の中には高レベル言語のものであるかのように感じられるものさえあるにもかかわらず、です。
+それでも、Rustでは低レベル言語の行うような細かい制御も依然として許されています。
 
 [rust]: https://www.rust-lang.org
 
-“The Rust Programming Language” is split into eight sections. This introduction
-is the first. After this:
+「プログラミング言語Rust」は8つのセクションに分かれています。
+この導入が1つ目です。
+その後はこのようになっています。
 
-* [Getting started][gs] - Set up your computer for Rust development.
-* [Learn Rust][lr] - Learn Rust programming through small projects.
-* [Effective Rust][er] - Higher-level concepts for writing excellent Rust code.
-* [Syntax and Semantics][ss] - Each bit of Rust, broken down into small chunks.
-* [Nightly Rust][nr] - Cutting-edge features that aren’t in stable builds yet.
-* [Glossary][gl] - A reference of terms used in the book.
-* [Bibliography][bi] - Background on Rust's influences, papers about Rust.
+* [始めましょう][gs] - Rustの開発のためにコンピューターをセットアップします。
+* [Rustの学習][lr] - 小さなプロジェクトを通じてRustでのプログラミングを学びます。
+* [Effective Rust][er] - すばらしいRustのコードを書くための高レベルの概念。
+* [構文と意味][ss] - 小さな塊に分解した、Rustのそれぞれの要素。
+* [Nightly Rust][nr] - 安定版ビルドにはまだ入っていない最新鋭の機能。
+* [用語集][gl] - 本書で使われている用語のリファレンス。
+* [参考文献][bi] - Rustの勢力の背景、Rustについての論文。
 
 [gs]: getting-started.html
 [lr]: learn-rust.html
@@ -34,24 +30,20 @@ is the first. After this:
 [gl]: glossary.html
 [bi]: bibliography.html
 
-After reading this introduction, you’ll want to dive into either ‘Learn Rust’
-or ‘Syntax and Semantics’, depending on your preference: ‘Learn Rust’ if you
-want to dive in with a project, or ‘Syntax and Semantics’ if you prefer to
-start small, and learn a single concept thoroughly before moving onto the next.
-Copious cross-linking connects these parts together.
+この導入を読んだ後には、好みによって「Rustの学習」か「構文と意味」のどちらかに入りたくなるでしょう。もしあなたがプロジェクトから学びたいのであれば「Rustの学習」、小さく始めて、先に進む前に1つの概念を深く学びたいのであれば「構文と意味」です。
+たくさんのハイパーリンクがそれらのパートを接続しています。
 
-### Contributing
+### 貢献
 
-The source files from which this book is generated can be found on Github:
-[github.com/rust-lang/rust/tree/master/src/doc/trpl](https://github.com/rust-lang/rust/tree/master/src/doc/trpl)
+生成された本書のソースファイルはGitHubの[github.com/rust-lang/rust/tree/master/src/doc/trpl](https://github.com/rust-lang/rust/tree/master/src/doc/trpl)で見付けることができます。
 
-## A brief introduction to Rust
+## Rustの簡単な導入
 
-Is Rust a language you might be interested in? Let’s examine a few small code
-samples to show off a few of its strengths.
+Rustに興味を持ってもらえたでしょうか。
+その強力さを少し披露するためにいくつかの小さなコード例を見てみましょう。
 
-The main concept that makes Rust unique is called ‘ownership’. Consider this
-small example:
+Rustの独自性を形成する主な概念は「所有権」と呼ばれるものです。
+この小さな例について考えてみましょう。
 
 ```rust
 fn main() {
@@ -59,43 +51,38 @@ fn main() {
 }
 ```
 
-This program makes a [variable binding][var] named `x`. The value of this
-binding is a `Vec<T>`, a ‘vector’, that we create through a [macro][macro]
-defined in the standard library. This macro is called `vec`, and we invoke
-macros with a `!`. This follows a general principle of Rust: make things
-explicit. Macros can do significantly more complicated things than function
-calls, and so they’re visually distinct. The `!` also helps with parsing,
-making tooling easier to write, which is also important.
+このプログラムは`x`と名付けられた[変数束縛][var]を作ります。
+この束縛の値は`Vec<T>`、「ベクター」です。これは標準ライブラリーで定義された[マクロ][macro]を使って作ることができます。
+このマクロは`vec`と呼ばれていて、マクロは`!`を付けて実行します。
+これは、物事を明示せよというRustの一般原則に従っています。
+マクロは関数呼出しよりもはるかに複雑なことができるので、見た目から異なっているのです。
+`!`はパースの際の助けにもなり、ツールを書きやすくしてくれます。このこともまた重要です。
 
-We used `mut` to make `x` mutable: bindings are immutable by default in Rust.
-We’ll be mutating this vector later in the example.
+`mut`は`x`をミュータブルにします。Rustでは束縛はデフォルトでイミュータブルです。
+このベクターは例の後で使います。
 
-It’s also worth noting that we didn’t need a type annotation here: while Rust
-is statically typed, we didn’t need to explicitly annotate the type. Rust has
-type inference to balance out the power of static typing with the verbosity of
-annotating types.
+ここでは型注釈が不要だということに気が付くことに価値があります。
+Rustは静的型付けですが、明示的に型注釈を付ける必要はありません。
+Rustは静的型付けのパワーと型注釈の冗長さとのバランスを取るために型推論を行います。
 
-Rust prefers stack allocation to heap allocation: `x` is placed directly on the
-stack. However, the `Vec<T>` type allocates space for the elements of the
-vector on the heap. If you’re not familiar with this distinction, you can
-ignore it for now, or check out [‘The Stack and the Heap’][heap]. As a systems
-programming language, Rust gives you the ability to control how your memory is
-allocated, but when we’re getting started, it’s less of a big deal.
+Rustはヒープ割当てよりもスタック割当てを好みます。`x`はスタックに直接格納されます。
+しかし、`Vec<T>`型はベクターの要素をヒープ上に割り当てます。
+もし、この違いに慣れていないのであれば、今は無視しても構いませんし、[「スタックとヒープ」][heap]をチェックすることもできます。
+システムプログラミング言語として、Rustではメモリーがどのように割り当てられるのかを制御することができます。しかし、私たちはまだ始めたところなので、それは大して重要ではありません。
 
 [var]: variable-bindings.html
 [macro]: macros.html
 [heap]: the-stack-and-the-heap.html
 
-Earlier, we mentioned that ‘ownership’ is the key new concept in Rust. In Rust
-parlance, `x` is said to ‘own’ the vector. This means that when `x` goes out of
-scope, the vector’s memory will be de-allocated. This is done deterministically
-by the Rust compiler, rather than through a mechanism such as a garbage
-collector. In other words, in Rust, you don’t call functions like `malloc` and
-`free` yourself: the compiler statically determines when you need to allocate
-or deallocate memory, and inserts those calls itself. To err is to be human,
-but compilers never forget.
+前の方で、Rustでは「所有権」が鍵となる新しい概念だと言いました。
+Rustの用語法では、`x`はそのベクターを「所有する」と言います。
+これは、`x`がスコープから外れたとき、ベクターのメモリーは解放されるということを意味します。
+これはガベージコレクターのようなメカニズムを通じて行われるのではなく、Rustのコンパイラーによって確定的に行われます。
+言い換えれば、Rustでは、`malloc`や`free`のような関数を自分で呼び出すことはないということです。
+いつメモリーの割当てや解放が必要になるかはコンパイラーが静的に決定し、コンパイラーがそれらの呼出しを挿入します。
+過つは人の性ですが、コンパイラーは決して忘れません。
 
-Let’s add another line to our example:
+例に行を追加してみましょう。
 
 ```rust
 fn main() {
@@ -105,17 +92,17 @@ fn main() {
 }
 ```
 
-We’ve introduced another binding, `y`. In this case, `y` is a ‘reference’ to
-the first element of the vector. Rust’s references are similar to pointers in
-other languages, but with additional compile-time safety checks. References
-interact with the ownership system by [‘borrowing’][borrowing] what they point
-to, rather than owning it. The difference is, when the reference goes out of
-scope, it will not deallocate the underlying memory. If it did, we’d
-de-allocate twice, which is bad!
+もう1つの束縛、`y`を作りました。
+この場合、`y`はベクターの先頭の要素の「参照」です。
+Rustの参照は他言語でのポインターと似ていますが、コンパイル時の安全性チェックが加えられています。
+所有権システムにおいて、参照は[「借用」][borrowing]と関係します。参照は、所有するものではなく、指示するものです。
+その違いは、参照がスコープから外れたとき、指示先のメモリーを解放しないことです。
+もし解放してしまえば、二重に解放してしまうことになるので、まずいのです！
 
 [borrowing]: references-and-borrowing.html
 
-Let’s add a third line. It looks innocent enough, but causes a compiler error:
+3行目を追加しましょう。
+全く問題ないように見えますが、これはコンパイルエラーを引き起こします。
 
 ```rust,ignore
 fn main() {
@@ -127,8 +114,8 @@ fn main() {
 }
 ```
 
-`push` is a method on vectors that appends another element to the end of the
-vector. When we try to compile this program, we get an error:
+`push`は他の要素をベクターの末尾に追加する、ベクターのメソッドです。
+このプログラムをコンパイルしようとすると、エラーが出ます。
 
 ```text
 error: cannot borrow `x` as mutable because it is also borrowed as immutable
@@ -145,20 +132,21 @@ fn main() {
 ^
 ```
 
-Whew! The Rust compiler gives quite detailed errors at times, and this is one
-of those times. As the error explains, while we made our binding mutable, we
-still cannot call `push`. This is because we already have a reference to an
-element of the vector, `y`. Mutating something while another reference exists
-is dangerous, because we may invalidate the reference. In this specific case,
-when we create the vector, we may have only allocated space for two elements.
-Adding a third would mean allocating a new chunk of memory for all those elements,
-copying the old values over, and updating the internal pointer to that memory.
-That all works just fine. The problem is that `y` wouldn’t get updated, and so
-we’d have a ‘dangling pointer’. That’s bad. Any use of `y` would be an error in
-this case, and so the compiler has caught this for us.
+うわっ！
+Rustのコンパイラーはときどき非常に詳細なエラーを出してくれますが、これはその1つです。
+エラーに書かれているとおり、作った束縛をミュータブルにしたのに、まだ`push`を呼び出すことができません。
+これは、ベクター`y`の要素の参照を既に持っていることが原因です。
+既に参照が存在するのに、それをミュータブルにするのは危険です。なぜなら、参照を不正にしてしまうかもしれないからです。
+今回の場合で言えば、ベクターを作ったときには2つの要素についてスペースを割り当てただけでした。
+3つ目を追加することは全ての要素のための新しいメモリーの塊を割り当てて、古い値をそこにコピーして、そしてそのメモリーを指示する内部のポインターを更新することを意味します。
+それは全てうまく動きます。
+問題は、`y`が更新されず、「指示先不明のポインター」になってしまうことにあります。
+それはいけません。
+この場合、`y`をどのように使ってもエラーになってしまうので、コンパイラーはこれを検出するのです。
 
-So how do we solve this problem? There are two approaches we can take. The first
-is making a copy rather than using a reference:
+この問題はどうすれば解決できるのでしょうか。
+採り得る方法は2つです。
+1つ目は参照を使うのではなくコピーを作る方法です。
 
 ```rust
 fn main() {
@@ -170,15 +158,14 @@ fn main() {
 }
 ```
 
-Rust has [move semantics][move] by default, so if we want to make a copy of some
-data, we call the `clone()` method. In this example, `y` is no longer a reference
-to the vector stored in `x`, but a copy of its first element, `"Hello"`. Now
-that we don’t have a reference, our `push()` works just fine.
+Rustはデフォルトで[移動方式][move]を採用しているので、あるデータのコピーを作りたいときは、`clone()`メソッドを呼び出します。
+この例では、`y`はもう`x`を保存したベクターへの参照ではありませんが、その先頭の要素、`"Hello"`のコピーになります。
+参照を持たなくなったのですから、`push()`はちゃんと動きます。
 
 [move]: ownership.html#move-semantics
 
-If we truly want a reference, we need the other option: ensure that our reference
-goes out of scope before we try to do the mutation. That looks like this:
+もし、本当に参照が必要ならば、別の選択肢が必要です。変更をしようとする前に参照がスコープから確実に外れているようにするのです。
+それはこのようになります。
 
 ```rust
 fn main() {
@@ -192,8 +179,7 @@ fn main() {
 }
 ```
 
-We created an inner scope with an additional set of curly braces. `y` will go out of
-scope before we call `push()`, and so we’re all good.
+1組の追加の波括弧で内側のスコープを作りました。
+`push()`を呼び出す前に`y`はスコープから外れるので、全てうまく動きます。
 
-This concept of ownership isn’t just good for preventing dangling pointers, but an
-entire set of related problems, like iterator invalidation, concurrency, and more.
+この所有権の概念は、指示先不明のポインターを避けるためだけに有効なのではありません。イテレーターの不正、並行性、そしてその他の関連する問題全体に対して有効なのです。
