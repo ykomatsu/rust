@@ -1,7 +1,7 @@
-% Conditional Compilation
+% 条件付きコンパイル
 
-Rust has a special attribute, `#[cfg]`, which allows you to compile code
-based on a flag passed to the compiler. It has two forms:
+Rustには`#[cfg]`という特別な属性があります。これによって、あなたはコンパイラーに渡されるフラグに基づいてコードをコンパイルできるようになります。
+それには2つの形式があります。
 
 ```rust
 #[cfg(foo)]
@@ -11,7 +11,7 @@ based on a flag passed to the compiler. It has two forms:
 # fn bar() {}
 ```
 
-They also have some helpers:
+それらにはいくつかのヘルパーもあります。
 
 ```rust
 #[cfg(any(unix, windows))]
@@ -24,15 +24,14 @@ They also have some helpers:
 # fn not_foo() {}
 ```
 
-These can nest arbitrarily:
+それらは好きなようにネストさせることもできます。
 
 ```rust
 #[cfg(any(not(unix), all(target_os="macos", target_arch = "powerpc")))]
 # fn foo() {}
 ```
 
-As for how to enable or disable these switches, if you’re using Cargo,
-they get set in the [`[features]` section][features] of your `Cargo.toml`:
+どのようにしてそれらのスイッチの有効、無効を切り替えるのかというと、もしあなたがCargoを使っているのであれば、`Cargo.toml`の[`[features]`セクション][features]内でセットします。
 
 [features]: http://doc.crates.io/manifest.html#the-features-section
 
@@ -45,14 +44,14 @@ default = []
 secure-password = ["bcrypt"]
 ```
 
-When you do this, Cargo passes along a flag to `rustc`:
+あなたがこうすると、Cargoは`rustc`にフラグを伝えます。
 
 ```text
 --cfg feature="${feature_name}"
 ```
 
-The sum of these `cfg` flags will determine which ones get activated, and
-therefore, which code gets compiled. Let’s take this code:
+それらの`cfg`フラグを総合して、どれを有効にするか、そしてどのコードをコンパイルするかを決定します。
+このコードを見ましょう。
 
 ```rust
 #[cfg(feature = "foo")]
@@ -60,26 +59,23 @@ mod foo {
 }
 ```
 
-If we compile it with `cargo build --features "foo"`, it will send the `--cfg
-feature="foo"` flag to `rustc`, and the output will have the `mod foo` in it.
-If we compile it with a regular `cargo build`, no extra flags get passed on,
-and so, no `foo` module will exist.
+もし私たちがこれを`cargo build --features "foo"`でコンパイルすれば、`--cfg feature="foo"`フラグが`rustc`に送られます。そして、その出力には`mod foo`が含まれます。
+もし私たちが通常の`cargo build`でコンパイルすれば、追加のフラグは送られないので、`foo`モジュールは生成されません。
 
 # cfg_attr
 
-You can also set another attribute based on a `cfg` variable with `cfg_attr`:
+あなたは`cfg_attr`付きの`cfg`変数に基づいて、別の属性をセットすることもできます。
 
 ```rust
 #[cfg_attr(a, b)]
 # fn foo() {}
 ```
 
-Will be the same as `#[b]` if `a` is set by `cfg` attribute, and nothing otherwise.
+もし`a`が`cfg`属性によってセットされていれば、これは`#[b]`と同じことになり、セットされていなければ、何もないのと同じことになります。
 
 # cfg!
 
-The `cfg!` [syntax extension][compilerplugins] lets you use these kinds of flags
-elsewhere in your code, too:
+`cfg!`[構文拡張][compilerplugins]によって、あなたはそれらの種類のフラグをコードの他の場所でも使うことができるようになります。
 
 ```rust
 if cfg!(target_os = "macos") || cfg!(target_os = "ios") {
@@ -89,5 +85,4 @@ if cfg!(target_os = "macos") || cfg!(target_os = "ios") {
 
 [compilerplugins]: compiler-plugins.html
 
-These will be replaced by a `true` or `false` at compile-time, depending on the
-configuration settings.
+設定によって、それらはコンパイル時に`true`か`false`に置き換えられます。
