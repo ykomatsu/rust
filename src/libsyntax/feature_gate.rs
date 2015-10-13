@@ -81,8 +81,8 @@ const KNOWN_FEATURES: &'static [(&'static str, &'static str, Option<u32>, Status
     ("associated_types", "1.0.0", None, Accepted),
     ("visible_private_types", "1.0.0", None, Active),
     ("slicing_syntax", "1.0.0", None, Accepted),
-    ("box_syntax", "1.0.0", None, Active),
-    ("placement_in_syntax", "1.0.0", None, Active),
+    ("box_syntax", "1.0.0", Some(27779), Active),
+    ("placement_in_syntax", "1.0.0", Some(27779), Active),
     ("pushpop_unsafe", "1.2.0", None, Active),
     ("on_unimplemented", "1.0.0", None, Active),
     ("simd_ffi", "1.0.0", None, Active),
@@ -135,6 +135,10 @@ const KNOWN_FEATURES: &'static [(&'static str, &'static str, Option<u32>, Status
     // Allows using the unsafe_no_drop_flag attribute (unlikely to
     // switch to Accepted; see RFC 320)
     ("unsafe_no_drop_flag", "1.0.0", None, Active),
+
+    // Allows using the unsafe_destructor_blind_to_params attribute;
+    // RFC 1238
+    ("dropck_parametricity", "1.3.0", Some(28498), Active),
 
     // Allows the use of custom attributes; RFC 572
     ("custom_attribute", "1.0.0", None, Active),
@@ -339,6 +343,11 @@ pub const KNOWN_ATTRIBUTES: &'static [(&'static str, AttributeType, AttributeGat
     ("unsafe_no_drop_flag", Whitelisted, Gated("unsafe_no_drop_flag",
                                                "unsafe_no_drop_flag has unstable semantics \
                                                 and may be removed in the future")),
+    ("unsafe_destructor_blind_to_params",
+     Normal,
+     Gated("dropck_parametricity",
+           "unsafe_destructor_blind_to_params has unstable semantics \
+            and may be removed in the future")),
     ("unwind", Whitelisted, Gated("unwind_attributes", "#[unwind] is experimental")),
 
     // used in resolve
@@ -726,7 +735,7 @@ impl<'a, 'v> Visitor<'v> for MacroVisitor<'a> {
 }
 
 struct PostExpansionVisitor<'a> {
-    context: &'a Context<'a>
+    context: &'a Context<'a>,
 }
 
 impl<'a> PostExpansionVisitor<'a> {
@@ -1107,8 +1116,7 @@ pub enum UnstableFeatures {
     /// Errors are bypassed for bootstrapping. This is required any time
     /// during the build that feature-related lints are set to warn or above
     /// because the build turns on warnings-as-errors and uses lots of unstable
-    /// features. As a result, this this is always required for building Rust
-    /// itself.
+    /// features. As a result, this is always required for building Rust itself.
     Cheat
 }
 

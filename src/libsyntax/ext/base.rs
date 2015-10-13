@@ -13,7 +13,7 @@ pub use self::SyntaxExtension::*;
 use ast;
 use ast::Name;
 use codemap;
-use codemap::{CodeMap, Span, ExpnId, ExpnInfo, NO_EXPANSION, CompilerExpansion};
+use codemap::{CodeMap, Span, ExpnId, ExpnInfo, NO_EXPANSION};
 use ext;
 use ext::expand;
 use ext::tt::macro_rules;
@@ -600,7 +600,7 @@ impl<'a> ExtCtxt<'a> {
         self.expander().fold_expr(e)
     }
 
-    /// Returns a `Folder` for deeply expanding all macros in a AST node.
+    /// Returns a `Folder` for deeply expanding all macros in an AST node.
     pub fn expander<'b>(&'b mut self) -> expand::MacroExpander<'b, 'a> {
         expand::MacroExpander::new(self)
     }
@@ -651,10 +651,7 @@ impl<'a> ExtCtxt<'a> {
                         return None;
                     }
                     expn_id = i.call_site.expn_id;
-                    match i.callee.format {
-                        CompilerExpansion(..) => (),
-                        _ => last_macro = Some(i.call_site),
-                    }
+                    last_macro = Some(i.call_site);
                     return Some(());
                 })
             }).is_none() {
