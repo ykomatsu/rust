@@ -68,5 +68,7 @@
     * [Box Syntax and Patterns](box-syntax-and-patterns.md)
     * [Slice Patterns](slice-patterns.md)
     * [Associated Constants](associated-constants.md)
+    * [Custom Allocators](custom-allocators.md)
 * [用語集](glossary.md)
+* [構文索引](syntax-index.md)
 * [参考文献](bibliography.md)
