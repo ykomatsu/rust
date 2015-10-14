@@ -35,7 +35,9 @@ Rustはまた、「0コストの抽象化」を実現することも目標とし
 
 ### 貢献
 
-生成された本書のソースファイルはGitHubの[github.com/rust-lang/rust/tree/master/src/doc/trpl](https://github.com/rust-lang/rust/tree/master/src/doc/trpl)で見付けることができます。
+本書を生成するためのソースファイルはGitHubの[github.com/rust-lang/rust/tree/master/src/doc/trpl](https://github.com/rust-lang/rust/tree/master/src/doc/trpl)に置いてあります。[^trpl-ja]
+
+[^trpl-ja]: 訳注。日本語訳のソースファイルはGitHubの[github.com/ykomatsu/rust/tree/trpl-ja/src/doc/trpl-ja](https://github.com/ykomatsu/rust/tree/trpl-ja/src/doc/trpl-ja)に置いてあります。
 
 ## Rustの簡単な導入
 
