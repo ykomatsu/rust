@@ -13,7 +13,7 @@
     * [テスト](testing.md)
     * [条件付きコンパイル](conditional-compilation.md)
     * [ドキュメント](documentation.md)
-    * [Iterators](iterators.md)
+    * [イテレーター](iterators.md)
     * [Concurrency](concurrency.md)
     * [Error Handling](error-handling.md)
     * [Choosing your Guarantees](choosing-your-guarantees.md)
