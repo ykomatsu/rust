@@ -1,72 +1,52 @@
-% Concurrency
+% 並行性
 
-Concurrency and parallelism are incredibly important topics in computer
-science, and are also a hot topic in industry today. Computers are gaining more
-and more cores, yet many programmers aren't prepared to fully utilize them.
+並行性と並列性は、コンピューターサイエンスにおいて極めて重要な話題です。そして、それは今日では産業界においてもホットな話題です。
+コンピューターのコアはどんどん増えていきますが、多くのプログラマーはたくさんのコアを活用するための準備ができていません。
 
-Rust's memory safety features also apply to its concurrency story too. Even
-concurrent Rust programs must be memory safe, having no data races. Rust's type
-system is up to the task, and gives you powerful ways to reason about
-concurrent code at compile time.
+Rustのメモリー安全性の機能は、その並行性の話題にも適合的です。
+並行に動作するRustプログラムもメモリー安全でなければならず、データ競合は起こりません。
+Rustの型システムは仕事に耐え、あなたはコンパイル時に並行に動作するコードについて推論するための強力な方法を得ることができます。
 
-Before we talk about the concurrency features that come with Rust, it's important
-to understand something: Rust is low-level enough that the vast majority of
-this is provided by the standard library, not by the language. This means that
-if you don't like some aspect of the way Rust handles concurrency, you can
-implement an alternative way of doing things.
-[mio](https://github.com/carllerche/mio) is a real-world example of this
-principle in action.
+私たちがRustに備わっている並行性の機能について話す前に、次のことを理解しておくことが重要です。Rustはかなり低レベルなので、並行性の機能を言語レベルで提供しているのではなく、標準ライブラリーレベルで提供しています。
+これは、もしあなたがRustにおける並行性の扱い方のいくつかの面を気に入らないのであれば、あなたはそうするための別の方法を実装することができるということを意味します。
+[mio](https://github.com/carllerche/mio)はその原則を実行に移した実例です。
 
-## Background: `Send` and `Sync`
+## 背景としての`Send`と`Sync`
 
-Concurrency is difficult to reason about. In Rust, we have a strong, static
-type system to help us reason about our code. As such, Rust gives us two traits
-to help us make sense of code that can possibly be concurrent.
+並行性は理解の難しいものです。
+Rustでは、コードの理解を助けるために、私たちは強力で静的な型システムを持っています。
+例えば、Rustは並行に動作するコードの理解を助けるために、私たちに2つのトレイトを提供しています。
 
 ### `Send`
 
-The first trait we're going to talk about is
-[`Send`](../std/marker/trait.Send.html). When a type `T` implements `Send`, it
-indicates that something of this type is able to have ownership transferred
-safely between threads.
+私たちが最初に話そうとしているトレイトは[`Send`](../std/marker/trait.Send.html)です。
+型`T`が`Send`を実装しているとき、それはこの型のものはスレッド間で所有権を移転することができるということを示します。
 
-This is important to enforce certain restrictions. For example, if we have a
-channel connecting two threads, we would want to be able to send some data
-down the channel and to the other thread. Therefore, we'd ensure that `Send` was
-implemented for that type.
+これはある制約を強制するために重要です。
+例えば、私たちが2つのスレッドを接続するチャネルを持っているとき、私たちはチャネルにデータを入れて、もう1つのスレッドに送ることができるようにしたいと思うでしょう。
+そのために、私たちはその型に`Send`が実装されていることを確実にします。
 
-In the opposite way, if we were wrapping a library with [FFI][ffi] that isn't
-threadsafe, we wouldn't want to implement `Send`, and so the compiler will help
-us enforce that it can't leave the current thread.
+一方で、もし私たちが[FFI][ffi]を使ったスレッドセーフでないライブラリーをラップしているのであれば、私たちは`Send`を実装したいとは思わないでしょう。そうすれば、それが現在のスレッドから離れられないように、コンパイラーが強制してくれます。
 
 [ffi]: ffi.html
 
 ### `Sync`
 
-The second of these traits is called [`Sync`](../std/marker/trait.Sync.html).
-When a type `T` implements `Sync`, it indicates that something
-of this type has no possibility of introducing memory unsafety when used from
-multiple threads concurrently through shared references. This implies that
-types which don't have [interior mutability](mutability.html) are inherently
-`Sync`, which includes simple primitive types (like `u8`) and aggregate types
-containing them.
+2つ目のトレイトは[`Sync`](../std/marker/trait.Sync.html)というものです。
+型`T`が`Sync`を実装しているとき、それはこの型のものが参照を共有することで複数のスレッドから並行して使われてもメモリーの安全性を損なわないということを示します。
+これは、[内的ミュータビリティー](mutability.html)を持たない型は本来的に`Sync`であるということを含んでいます。そのような型には、単純なプリミティブ型（`u8`のような）やそれらを含む集合の型が含まれます。
 
-For sharing references across threads, Rust provides a wrapper type called
-`Arc<T>`. `Arc<T>` implements `Send` and `Sync` if and only if `T` implements
-both `Send` and `Sync`. For example, an object of type `Arc<RefCell<U>>` cannot
-be transferred across threads because
-[`RefCell`](choosing-your-guarantees.html#refcellt) does not implement
-`Sync`, consequently `Arc<RefCell<U>>` would not implement `Send`.
+スレッド間で参照を共有するために、Rustは`Arc<T>`というラッパー型を提供しています。
+`Arc<T>`は`T`が`Send`、`Sync`の両方を実装している場合に限り、`Send`、`Sync`を実装します。
+例えば、`Arc<RefCell<U>>`型のオブジェクトはスレッド間で転送することができません。なぜなら、[`RefCell`](choosing-your-guarantees.html#refcellt)は`Sync`を実装しておらず、従って`Arc<RefCell<U>>`も`Send`を実装しないからです。
 
-These two traits allow you to use the type system to make strong guarantees
-about the properties of your code under concurrency. Before we demonstrate
-why, we need to learn how to create a concurrent Rust program in the first
-place!
+これらの2つのトレイトによって、私たちは並行性の下でコードの資産を強力に保証するために型システムを使うことができます。
+その理由を証明する前に、まず、私たちは並行に動作するRustプログラムの作り方を学ぶ必要があります！
 
-## Threads
+## スレッド
 
-Rust's standard library provides a library for threads, which allow you to
-run Rust code in parallel. Here's a basic example of using `std::thread`:
+Rustの標準ライブラリーはスレッドのためのライブラリーを提供しています。これによって、あなたはRustのコードを並列実行することができます。
+これは`std::thread`を使った基本的な例です。
 
 ```rust
 use std::thread;
@@ -78,9 +58,8 @@ fn main() {
 }
 ```
 
-The `thread::spawn()` method accepts a [closure](closures.html), which is executed in a
-new thread. It returns a handle to the thread, that can be used to
-wait for the child thread to finish and extract its result:
+`thread::spawn()`メソッドは、新しいスレッドの中で実行される[クロージャー](closures.html)を受け取ります。
+そのメソッドはスレッドのハンドルを戻します。そのハンドルは子スレッドが終わって結果を戻すのを待つために使うことができます。
 
 ```rust
 use std::thread;
@@ -94,30 +73,25 @@ fn main() {
 }
 ```
 
-Many languages have the ability to execute threads, but it's wildly unsafe.
-There are entire books about how to prevent errors that occur from shared
-mutable state. Rust helps out with its type system here as well, by preventing
-data races at compile time. Let's talk about how you actually share things
-between threads.
+多くの言語にはスレッドを実行する能力がありますが、それは大体アンセーフです。
+ミュータブルな状態を共有することによって引き起こされるエラーを回避する方法についての本が一式あります。
+ここでも、Rustはその型システムによってコンパイル時のデータ競合を回避することで手助けします。
+あなたが実際にはどのようにスレッド間で何かを共有するのかについて話しましょう。
 
-## Safe Shared Mutable State
+## 安全な共有されているミュータブルな状態
 
-Due to Rust's type system, we have a concept that sounds like a lie: "safe
-shared mutable state." Many programmers agree that shared mutable state is
-very, very bad.
+Rustの型システムによって、私たちは嘘っぽく聞こえる概念を得ました。「安全な共有されているミュータブルな状態」です。
+多くのプログラマーは、共有されているミュータブルな状態は非常に非常に悪いということに同意します。
 
-Someone once said this:
+ある人はかつてこう言いました。
 
-> Shared mutable state is the root of all evil. Most languages attempt to deal
-> with this problem through the 'mutable' part, but Rust deals with it by
-> solving the 'shared' part.
+> 共有されたミュータブルな状態は全ての悪の根源である。
+> 多くの言語はこの問題を「ミュータブル」な部分の問題として扱おうとした。しかし、Rustはそれを「共有」された部分を解決することによって扱うのだ。
 
-The same [ownership system](ownership.html) that helps prevent using pointers
-incorrectly also helps rule out data races, one of the worst kinds of
-concurrency bugs.
+ポインターを不正に使うことを回避することを手助けする[所有権システム](ownership.html)が、最も悪い並列性のバグの1つであるデータ競合を排除するために役立つのと同様です。
 
-As an example, here is a Rust program that would have a data race in many
-languages. It will not compile:
+例のとおり、これは多くの言語ではデータ競合を含むことになるRustのプログラムです。
+これはコンパイルできません。
 
 ```ignore
 use std::thread;
@@ -135,7 +109,7 @@ fn main() {
 }
 ```
 
-This gives us an error:
+これはエラーを出します。
 
 ```text
 8:17 error: capture of moved value: `data`
@@ -143,24 +117,17 @@ This gives us an error:
         ^~~~
 ```
 
-Rust knows this wouldn't be safe! If we had a reference to `data` in each
-thread, and the thread takes ownership of the reference, we'd have three
-owners!
+Rustはこれが安全ではないことを知っているのです！
+もし私たちが各スレッドに`data`の参照を持っていて、そのスレッドが参照の所有権を受け取れば、私たちは3人の所有者を抱えることになります！
 
-So, we need some type that lets us have more than one reference to a value and
-that we can share between threads, that is it must implement `Sync`.
+そこで、私たちは値に対する参照を1つより多く持つことができ、スレッド間で共有できるような型を必要とします。その型は`Sync`を実装しなければなりません。
 
-We'll use `Arc<T>`, rust's standard atomic reference count type, which
-wraps a value up with some extra runtime bookkeeping which allows us to
-share the ownership of the value between multiple references at the same time.
+私たちはRustの標準的なアトミック参照カウント型、`Arc<T>`を使います。これは、値にその所有権を複数の参照の間で共有することができるような実行時の記録保持機能を追加してラップします。
 
-The bookkeeping consists of a count of how many of these references exist to
-the value, hence the reference count part of the name.
+その記録保持機能はその値に対していくつの参照が存在するのかをカウントを含みます。そのため、参照カウント（reference count）がその名前の一部になっています。
 
-The Atomic part means `Arc<T>` can safely be accessed from multiple threads.
-To do this the compiler guarantees that mutations of the internal count use
-indivisible operations which can't have data races.
-
+アトミックの部分の意味は、`Arc<T>`に複数のスレッドから安全にアクセスできることを意味します。
+こうすることで、内部カウントの変更がデータ競合を起こさない分割不可能な操作を使うことをコンパイラーが保証してくれます。
 
 ```ignore
 use std::thread;
@@ -180,10 +147,10 @@ fn main() {
 }
 ```
 
-We now call `clone()` on our `Arc<T>`, which increases the internal count.
-This handle is then moved into the new thread.
+今度は、私たちは`Arc<T>`の`clone()`を呼び出しました。これは内部カウントを増加させます。
+それから、このハンドルは新しいスレッドへと移転します。
 
-And... still gives us an error.
+そして……、まだエラーが出ます。
 
 ```text
 <anon>:11:24 error: cannot borrow immutable borrowed content as mutable
@@ -191,18 +158,14 @@ And... still gives us an error.
                              ^~~~
 ```
 
-`Arc<T>` assumes one more property about its contents to ensure that it is safe
-to share across threads: it assumes its contents are `Sync`. This is true for
-our value if it's immutable, but we want to be able to mutate it, so we need
-something else to persuade the borrow checker we know what we're doing.
+`Arc<T>`はその内容についてのもう1つの資産がスレッド間で安全に共有できることを保証していることを仮定します。それは、その内容が`Sync`であるということを仮定します。
+これは私たちの値がイミュータブルであれば正しいですが、私たちはそれを変更できるようにしたいので、ボローチェッカーに対して私たちは何をしているのかを理解しているのだと説得する何かが必要です。
 
-It looks like we need some type that allows us to safely mutate a shared value,
-for example a type that can ensure only one thread at a time is able to
-mutate the value inside it at any one time.
+それは共有されている値を安全に変更できるようにする型を必要としているようなものです。例えば、いつでも同時には1つのスレッドしかその中の値を変更できないことを保証できる型です。
 
-For that, we can use the `Mutex<T>` type!
+そのために、私たちは`Mutex<T>`型を使うことができます！
 
-Here's the working version:
+これが動作するバージョンです。
 
 ```rust
 use std::sync::{Arc, Mutex};
@@ -223,20 +186,17 @@ fn main() {
 }
 ```
 
-Note that the value of `i` is bound (copied) to the closure and not shared
-among the threads.
+`i`の値はそのクロージャーに束縛され（コピーされ）、スレッド間では共有されないことに注意しましょう。
 
-Also note that [`lock`](../std/sync/struct.Mutex.html#method.lock) method of
-[`Mutex`](../std/sync/struct.Mutex.html) has this signature:
+[`Mutex`](../std/sync/struct.Mutex.html)の[`lock`](../std/sync/struct.Mutex.html#method.lock)メソッドがこのシグニチャーを持っていることにも注意しましょう。
 
 ```ignore
 fn lock(&self) -> LockResult<MutexGuard<T>>
 ```
 
-and because `Send` is not implemented for `MutexGuard<T>`, the guard cannot
-cross thread boundaries, ensuring thread-locality of lock acquire and release.
+`MutexGuard<T>`には`Send`が実装されておらず、そのガードはスレッドの境界をまたぐことができないので、ロックの取得と解放がスレッドローカルであることが保証されます。
 
-Let's examine the body of the thread more closely:
+スレッドの本体をもっと詳しく調べましょう。
 
 ```rust
 # use std::sync::{Arc, Mutex};
@@ -254,25 +214,20 @@ thread::spawn(move || {
 # }
 ```
 
-First, we call `lock()`, which acquires the mutex's lock. Because this may fail,
-it returns an `Result<T, E>`, and because this is just an example, we `unwrap()`
-it to get a reference to the data. Real code would have more robust error handling
-here. We're then free to mutate it, since we have the lock.
+最初に、私たちは`lock()`を呼び出します。これはミューテックスのロックを取得します。
+これは失敗するかもしれないので、`Result<T, E>`を戻します。これは単なる例なので、私たちはデータの参照を得るために`unwrap()`しています。
+本当のコードでは、ここでもっと強固なエラー処理をします。
+そして、私たちはロックを得たので、データを自由に変更します。
 
-Lastly, while the threads are running, we wait on a short timer. But
-this is not ideal: we may have picked a reasonable amount of time to
-wait but it's more likely we'll either be waiting longer than
-necessary or not long enough, depending on just how much time the
-threads actually take to finish computing when the program runs.
+スレッドが実行中なので、最後に私たちは短いタイマーで待ちます。
+しかし、これは理想的な方法ではありません。私たちはちょうどよい待ち時間を選べるかもしれませんが、それはそのプログラムを実行するときに、そのスレッドが実際に計算を終えるのに掛かる時間に依存するので、必要以上に待つことになったり待ち時間が十分でなかったりすることの方が多いでしょう。
 
-A more precise alternative to the timer would be to use one of the
-mechanisms provided by the Rust standard library for synchronizing
-threads with each other. Let's talk about one of them: channels.
+タイマーより簡潔な代替品は、スレッドを互いに同期させるためにRustの標準ライブラリーの提供するメカニズムの1つを使うことです。
+その1つについて話しましょう。チャネルです。
 
-## Channels
+## チャネル
 
-Here's a version of our code that uses channels for synchronization, rather
-than waiting for a specific time:
+これは特定の時間だけ待つのではなく、同期にチャネルを使うバージョンの私たちの例です。
 
 ```rust
 use std::sync::{Arc, Mutex};
@@ -301,11 +256,10 @@ fn main() {
 }
 ```
 
-We use the `mpsc::channel()` method to construct a new channel. We just `send`
-a simple `()` down the channel, and then wait for ten of them to come back.
+私たちは新しいチャネルを構築するために`mpsc::channel()`メソッドを使います。
+私たちは単純な`()`をチャネルに`send`し、それら10個が帰ってくるまで待ちます。
 
-While this channel is just sending a generic signal, we can send any data that
-is `Send` over the channel!
+このチャネルは一般的な信号を送っているだけですが、私たちは`Send`の付いているデータであれば何でもチャネルを通じて送ることができます！
 
 ```rust
 use std::thread;
@@ -330,14 +284,12 @@ fn main() {
 }
 ```
 
-Here we create 10 threads, asking each to calculate the square of a number (`i`
-at the time of `spawn()`), and then `send()` back the answer over the channel.
+これは10個のスレッドを生成し、それぞれに対して数値（`spawn()`したときの`i`）の平方を要求し、それから解答がチャネルを通じて`send()`されます。
 
+## パニック
 
-## Panics
-
-A `panic!` will crash the currently executing thread. You can use Rust's
-threads as a simple isolation mechanism:
+`panic!`は現在実行中のスレッドをクラッシュさせます。
+あなたはRustのスレッドを簡単な隔離のメカに住むとして使うことができます。
 
 ```rust
 use std::thread;
@@ -351,5 +303,4 @@ let result = handle.join();
 assert!(result.is_err());
 ```
 
-`Thread.join()` gives us a `Result` back, which allows us to check if the thread
-has panicked or not.
+`Thread.join()`は私たちに`Result`を戻します。それによって私たちはそのスレッドがパニックしたのかそうでないのかをチェックすることができます。

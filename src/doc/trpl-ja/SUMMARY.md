@@ -14,7 +14,7 @@
     * [条件付きコンパイル](conditional-compilation.md)
     * [ドキュメント](documentation.md)
     * [イテレーター](iterators.md)
-    * [Concurrency](concurrency.md)
+    * [並行性](concurrency.md)
     * [Error Handling](error-handling.md)
     * [Choosing your Guarantees](choosing-your-guarantees.md)
     * [FFI](ffi.md)
