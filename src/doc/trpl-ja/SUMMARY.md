@@ -19,7 +19,7 @@
     * [Choosing your Guarantees](choosing-your-guarantees.md)
     * [FFI](ffi.md)
     * [BorrowとAsRef](borrow-and-asref.md)
-    * [Release Channels](release-channels.md)
+    * [リリースチャネル](release-channels.md)
 * [構文と意味](syntax-and-semantics.md)
     * [Variable Bindings](variable-bindings.md)
     * [Functions](functions.md)
