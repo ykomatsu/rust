@@ -18,7 +18,7 @@
     * [Error Handling](error-handling.md)
     * [Choosing your Guarantees](choosing-your-guarantees.md)
     * [FFI](ffi.md)
-    * [Borrow and AsRef](borrow-and-asref.md)
+    * [BorrowとAsRef](borrow-and-asref.md)
     * [Release Channels](release-channels.md)
 * [構文と意味](syntax-and-semantics.md)
     * [Variable Bindings](variable-bindings.md)
