@@ -1,8 +1,8 @@
-% Variable Bindings
+% 変数束縛
 
-Virtually every non-'Hello World’ Rust program uses *variable bindings*. They
-bind some value to a name, so it can be used later. `let` is
-used to introduce a binding, just like this:
+「Hello World」以外の事実上すべてのRustのプログラムは *変数束縛* を使います。
+それらはある値を名前に束縛し、それを後で使えるようにします。
+`let`はこのように、束縛を導入するために使われます。
 
 ```rust
 fn main() {
@@ -10,52 +10,48 @@ fn main() {
 }
 ```
 
-Putting `fn main() {` in each example is a bit tedious, so we’ll leave that out
-in the future. If you’re following along, make sure to edit your `main()`
-function, rather than leaving it off. Otherwise, you’ll get an error.
+`fn main() {`をそれぞれの例に付けるのはやや冗長なので、私たちは今後、それを省略します。
+もしあなたが実際に入力しているのであれば、`main()`関数を省略するのではなく、それを付けるのを忘れないようにしましょう。
 
-# Patterns
+# パターン
 
-In many languages, a variable binding would be called a *variable*, but Rust’s
-variable bindings have a few tricks up their sleeves. For example the
-left-hand side of a `let` expression is a ‘[pattern][pattern]’, not just a
-variable name. This means we can do things like:
+多くの言語では、変数束縛は *変数* と呼ばれます。しかし、Rustの変数束縛にはいくつか秘密兵器があります。
+例えば、`let`式の左辺は単なる変数名ではなく、「[パターン][pattern]」です。
+これは、私たちにはこのようなことができるということです。
 
 ```rust
 let (x, y) = (1, 2);
 ```
 
-After this expression is evaluated, `x` will be one, and `y` will be two.
-Patterns are really powerful, and have [their own section][pattern] in the
-book. We don’t need those features for now, so we’ll just keep this in the back
-of our minds as we go forward.
+この式が評価された後、`x`は1になり、`y`は2になります。
+パターンは本当に強力で、本書には[それらのための独立したセクション][pattern]があります。
+今のところ、私たちにはそれらの機能は必要ないので、私たちは先に進むためにこれを記憶の片隅にとどめておくだけにします。
 
 [pattern]: patterns.html
 
-# Type annotations
+# 型注釈
 
-Rust is a statically typed language, which means that we specify our types up
-front, and they’re checked at compile time. So why does our first example
-compile? Well, Rust has this thing called ‘type inference’. If it can figure
-out what the type of something is, Rust doesn’t require you to actually type it
-out.
+Rustは静的型付言語です。これは、私たちが型を事前に指定し、それらがコンパイル時にチェックされるということを意味します。
+それでは、なぜ私たちの最初の例はコンパイルできたのでしょうか。
+ええ、Rustには「型推論」と呼ばれるものがあるのです。
+もしあるものの型が何であるかをそれが理解できるのであれば、Rustは実際に型を入力することをあなたに要求しません。
 
-We can add the type if we want to, though. Types come after a colon (`:`):
+しかし、私たちは望むのであれば型を付けることもできます。
+コロン（`:`）の後に入力しましょう。
 
 ```rust
 let x: i32 = 5;
 ```
 
-If I asked you to read this out loud to the rest of the class, you’d say “`x`
-is a binding with the type `i32` and the value `five`.”
+もし私があなたに、これを教室のみんなに向かって大きな声で読みなさいと言ったならば、あなたは「`x`は`i32`型の束縛で、その値は`5`です。」と言うでしょう。
 
-In this case we chose to represent `x` as a 32-bit signed integer. Rust has
-many different primitive integer types. They begin with `i` for signed integers
-and `u` for unsigned integers. The possible integer sizes are 8, 16, 32, and 64
-bits.
+この場合、私たちは`x`を表現するために32ビット符号付整数を選んでいます。
+Rustにはたくさんの異なった整数のプリミティブ型があります。
+それらが`i`から始まれば符号付き、`u`から始まれば符号なしです。
+利用可能な整数のサイズは8、16、32、64ビットです。
 
-In future examples, we may annotate the type in a comment. The examples will
-look like this:
+後の例では、私たちはコメントに型注釈を付けることがあるかもしれません。
+この例はこのようになります。
 
 ```rust
 fn main() {
@@ -63,21 +59,20 @@ fn main() {
 }
 ```
 
-Note the similarities between this annotation and the syntax you use with
-`let`. Including these kinds of comments is not idiomatic Rust, but we'll
-occasionally include them to help you understand what the types that Rust
-infers are.
+この注釈とあなたが`let`で使った文法の間の類似性に注意しましょう。
+それらの種類のコメントを付けることはRustでは慣習的ではありません。しかし、私たちはRustが推論した型が何であるのかをあなたが理解することを助けるためにときどきそれらを付けます。
 
-# Mutability
+# ミュータビリティー
 
-By default, bindings are *immutable*. This code will not compile:
+デフォルトで束縛は *イミュータブル* です。
+このコードはコンパイルできません。
 
 ```rust,ignore
 let x = 5;
 x = 10;
 ```
 
-It will give you this error:
+これは次のエラーを出します。
 
 ```text
 error: re-assignment of immutable variable `x`
@@ -85,32 +80,28 @@ error: re-assignment of immutable variable `x`
      ^~~~~~~
 ```
 
-If you want a binding to be mutable, you can use `mut`:
+もしあなたが束縛をミュータブルにしたいのであれば、あなたは`mut`を使うことができます。
 
 ```rust
 let mut x = 5; // mut x: i32
 x = 10;
 ```
 
-There is no single reason that bindings are immutable by default, but we can
-think about it through one of Rust’s primary focuses: safety. If you forget to
-say `mut`, the compiler will catch it, and let you know that you have mutated
-something you may not have intended to mutate. If bindings were mutable by
-default, the compiler would not be able to tell you this. If you _did_ intend
-mutation, then the solution is quite easy: add `mut`.
+束縛がデフォルトでイミュータブルであることの理由は1つではありません。しかし、私たちはRustの重要な焦点を通じてそれについて考えることができます。安全性です。
+もしあなたが`mut`と言うのを忘れれば、コンパイラーはそれを検出し、変更することを意図していないものを変更していることをあなたに知らせます。
+もし束縛がデフォルトでミュータブルだったら、コンパイラーはこれをあなたに知らせることができません。
+もしあなたが変更を意図して *いなかった* ならば、解決法は非常に簡単です。`mut`を付けましょう。
 
-There are other good reasons to avoid mutable state when possible, but they’re
-out of the scope of this guide. In general, you can often avoid explicit
-mutation, and so it is preferable in Rust. That said, sometimes, mutation is
-what you need, so it’s not verboten.
+可能であればミュータブルな状態を避けるということには他にもよい理由がありますが、それらはこのガイドの範囲外になります。
+一般的に、あなたはしばしば明示的な変更を避けることができ、Rustではそれが望ましいです。
+それはときどきこのように言われます。変更があなたの必要とするものならば、それは禁じられてはいません。
 
-# Initializing bindings
+# 束縛の初期化
 
-Rust variable bindings have one more aspect that differs from other languages:
-bindings are required to be initialized with a value before you're allowed to
-use them.
+Rustの変数束縛には他の言事は異なるもう1つの側面があります。束縛は、あなたがそれらの使用を許される前に値で初期化される必要があるということです。
 
-Let’s try it out. Change your `src/main.rs` file to look like this:
+それを試しましょう。
+あなたの`src/main.rs`ファイルをこのような感じに変更しましょう。
 
 ```rust
 fn main() {
@@ -120,8 +111,8 @@ fn main() {
 }
 ```
 
-You can use `cargo build` on the command line to build it. You’ll get a
-warning, but it will still print "Hello, world!":
+あなたはそれをビルドするためにコマンドラインで`cargo build`を使うことができます。
+警告が出ますが、それはまだ「Hello, world!」を出力します。
 
 ```text
    Compiling hello_world v0.0.1 (file:///home/you/projects/hello_world)
@@ -131,9 +122,10 @@ src/main.rs:2     let x: i32;
                       ^
 ```
 
-Rust warns us that we never use the variable binding, but since we never use
-it, no harm, no foul. Things change if we try to actually use this `x`,
-however. Let’s do that. Change your program to look like this:
+Rustは私たちに、その変数束縛が全く使われていないことを警告します。しかし、私たちはそれを全く使っていないのですから、怪我がなければファウルではありません。
+しかし、もし私たちが実際にこの`x`を使おうとするならば、話は変わります。
+そうしましょう。
+あなたのプログラムをこのような感じに変えましょう。
 
 ```rust,ignore
 fn main() {
@@ -143,7 +135,8 @@ fn main() {
 }
 ```
 
-And try to build it. You’ll get an error:
+そして、ビルドしてみましょう。
+エラーが出ます。
 
 ```bash
 $ cargo build
@@ -159,32 +152,28 @@ error: aborting due to previous error
 Could not compile `hello_world`.
 ```
 
-Rust will not let us use a value that has not been initialized. Next, let’s
-talk about this stuff we've added to `println!`.
+Rustは私たちに初期化されていない値を使わせてくれません。
+次に、私たちが`println!`に追加したものについて話しましょう。
 
-If you include two curly braces (`{}`, some call them moustaches...) in your
-string to print, Rust will interpret this as a request to interpolate some sort
-of value. *String interpolation* is a computer science term that means "stick
-in the middle of a string." We add a comma, and then `x`, to indicate that we
-want `x` to be the value we’re interpolating. The comma is used to separate
-arguments we pass to functions and macros, if you’re passing more than one.
+もしあなたが出力する文字列に2つの波括弧（`{}`です。マスタッシュと呼ぶ人もいます……）を入れたならば、Rustはこれをある種類の値の挿入を要求していると解釈します。
+*文字列挿入* はコンピューターサイエンス用語で「文字列の中に突っ込む」という意味です。
+私たちはコンマを追加し、それから私たちが`x`を挿入する値にしたいということを示すために`x`を追加します。
+コンマはあなたが1つより多い引数を関数やマクロに渡すときに、それらを区切るために使われます。
 
-When you just use the curly braces, Rust will attempt to display the value in a
-meaningful way by checking out its type. If you want to specify the format in a
-more detailed manner, there are a [wide number of options available][format].
-For now, we'll just stick to the default: integers aren't very complicated to
-print.
+あなたが単に波括弧だけを使った場合、Rustはその値の型をチェックし、意味のある方法でそれを表示しようとします。
+もしあなたがもっと詳しい方法で書式を指定したいのであれば、[たくさんのオプションがあります][format]。
+とりあえず、私たちはデフォルトのままにしておきます。整数は出力するのがそんなにややこしくはないからです。
 
 [format]: ../std/fmt/index.html
 
-# Scope and shadowing
+# スコープとシャドーイング
 
-Let’s get back to bindings. Variable bindings have a scope - they are
-constrained to live in a block they were defined in. A block is a collection
-of statements enclosed by `{` and `}`. Function definitions are also blocks!
-In the following example we define two variable bindings, `x` and `y`, which
-live in different blocks. `x` can be accessed from inside the `fn main() {}`
-block, while `y` can be accessed only from inside the inner block:
+束縛に戻りましょう。
+変数束縛にはスコープがあります。それらは定義されたときのブロックの中でしか生存できません。
+ブロックは`{`と`}`で囲まれた文の集まりです。
+関数定義もブロックです！　
+次の例では、私たちは別のブロックで生存する`x`と`y`の2つの変数束縛を定義します。
+`x`は`fn main() {}`ブロックの内側からアクセスできますが、`y`はもう1つ内側のブロックの内側からしかアクセスできません。
 
 ```rust,ignore
 fn main() {
@@ -197,10 +186,8 @@ fn main() {
 }
 ```
 
-The first `println!` would print "The value of x is 17 and the value of y is
-3", but this example cannot be compiled successfully, because the second
-`println!` cannot access the value of `y`, since it is not in scope anymore.
-Instead we get this error:
+1つ目の`println!`は「The value of x is 17 and the value of y is 3」と出力するのですが、この例は正常にコンパイルできません。なぜなら、2つ目の`println!`がもうスコープの中にいない`y`の値にアクセスできないからです。
+実際にはこのエラーが出ます。
 
 ```bash
 $ cargo build
@@ -221,9 +208,8 @@ Could not compile `hello`.
 To learn more, run the command again with --verbose.
 ```
 
-Additionaly, variable bindings can be shadowed. This means that a later
-variable binding with the same name as another binding, that's currently in
-scope, will override the previous binding.
+加えて、変数束縛はシャドーすることができます。
+これは、そのときスコープの中にある他の束縛と同じ名前の後に作られた変数束縛を意味し、前の束縛を上書きします。
 
 ```rust
 let x: i32 = 8;
@@ -237,10 +223,9 @@ let x =  42;
 println!("{}", x); // Prints "42"
 ```
 
-Shadowing and mutable bindings may appear as two sides of the same coin, but
-they are two distinct concepts that can't always be used interchangeably. For
-one, shadowing enables us to rebind a name to a value of a different type. It
-is also possible to change the mutability of a binding.
+シャドーイングとミュータブルな束縛とは同じコインの裏表のように見えるかもしれません。しかし、それらは常に置き換えて使うことができるわけではない別個の2つの概念です。
+一例として、シャドーイングによって私たちは名前を別の型の値に再束縛することができます。
+それは束縛のミュータビリティーを変更することも可能です。
 
 ```rust
 let mut x: i32 = 1;

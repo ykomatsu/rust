@@ -21,7 +21,7 @@
     * [BorrowとAsRef](borrow-and-asref.md)
     * [リリースチャネル](release-channels.md)
 * [構文と意味](syntax-and-semantics.md)
-    * [Variable Bindings](variable-bindings.md)
+    * [変数束縛](variable-bindings.md)
     * [Functions](functions.md)
     * [Primitive Types](primitive-types.md)
     * [Comments](comments.md)
