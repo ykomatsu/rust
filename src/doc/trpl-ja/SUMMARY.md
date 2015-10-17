@@ -22,7 +22,7 @@
     * [リリースチャネル](release-channels.md)
 * [構文と意味](syntax-and-semantics.md)
     * [変数束縛](variable-bindings.md)
-    * [Functions](functions.md)
+    * [関数](functions.md)
     * [Primitive Types](primitive-types.md)
     * [Comments](comments.md)
     * [if](if.md)
