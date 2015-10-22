@@ -58,7 +58,7 @@
     * [Raw Pointers](raw-pointers.md)
     * [`unsafe`](unsafe.md)
 * [Nightly Rust](nightly-rust.md)
-    * [Compiler Plugins](compiler-plugins.md)
+    * [コンパイラープラグイン](compiler-plugins.md)
     * [Inline Assembly](inline-assembly.md)
     * [No stdlib](no-stdlib.md)
     * [Intrinsics](intrinsics.md)
