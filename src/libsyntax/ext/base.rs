@@ -544,12 +544,6 @@ fn initial_syntax_expander_table<'feat>(ecfg: &expand::ExpansionConfig<'feat>)
     syntax_expanders.insert(intern("cfg"),
                             builtin_normal_expander(
                                     ext::cfg::expand_cfg));
-    syntax_expanders.insert(intern("push_unsafe"),
-                            builtin_normal_expander(
-                                ext::pushpop_safe::expand_push_unsafe));
-    syntax_expanders.insert(intern("pop_unsafe"),
-                            builtin_normal_expander(
-                                ext::pushpop_safe::expand_pop_unsafe));
     syntax_expanders.insert(intern("trace_macros"),
                             builtin_normal_expander(
                                     ext::trace_macros::expand_trace_macros));
@@ -593,7 +587,7 @@ impl<'a> ExtCtxt<'a> {
         }
     }
 
-    #[unstable(feature = "rustc_private")]
+    #[unstable(feature = "rustc_private", issue = "0")]
     #[deprecated(since = "1.0.0",
                  reason = "Replaced with `expander().fold_expr()`")]
     pub fn expand_expr(&mut self, e: P<ast::Expr>) -> P<ast::Expr> {

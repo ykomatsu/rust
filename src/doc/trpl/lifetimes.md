@@ -1,6 +1,6 @@
 % Lifetimes
 
-This guide is one of three presenting Rust’s ownership system. This is one of
+This guide is three of three presenting Rust’s ownership system. This is one of
 Rust’s most unique and compelling features, with which Rust developers should
 become quite acquainted. Ownership is how Rust achieves its largest goal,
 memory safety. There are a few distinct concepts, each with its own chapter:
@@ -74,7 +74,7 @@ associated with it, but the compiler lets you elide (i.e. omit, see
 ["Lifetime Elision"][lifetime-elision] below) them in common cases.
 Before we get to that, though, let’s break the explicit example down:
 
-[lifetime-elision]: #user-content-lifetime-elision
+[lifetime-elision]: #lifetime-elision
 
 ```rust,ignore
 fn bar<'a>(...)

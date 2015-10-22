@@ -209,7 +209,7 @@
 //! interesting implementation of [`IntoIterator`]:
 //!
 //! ```ignore
-//! impl<I> IntoIterator for I where I: Iterator
+//! impl<I: Iterator> IntoIterator for I
 //! ```
 //!
 //! In other words, all [`Iterator`]s implement [`IntoIterator`], by just
@@ -1453,7 +1453,7 @@ pub trait Iterator {
 ///
 /// This is an idiosyncratic helper to try to factor out the
 /// commonalities of {max,min}{,_by}. In particular, this avoids
-/// having to implement optimisations several times.
+/// having to implement optimizations several times.
 #[inline]
 fn select_fold1<I,B, FProj, FCmp>(mut it: I,
                                   mut f_proj: FProj,
@@ -1618,7 +1618,13 @@ impl<B, I: ExactSizeIterator, F> ExactSizeIterator for Map<I, F> where
 impl<A, B> ExactSizeIterator for Zip<A, B>
     where A: ExactSizeIterator, B: ExactSizeIterator {}
 
-/// An double-ended iterator with the direction inverted
+/// An double-ended iterator with the direction inverted.
+///
+/// This `struct` is created by the [`rev()`] method on [`Iterator`]. See its
+/// documentation for more.
+///
+/// [`rev()`]: trait.Iterator.html#method.rev
+/// [`Iterator`]: trait.Iterator.html
 #[derive(Clone)]
 #[must_use = "iterator adaptors are lazy and do nothing unless consumed"]
 #[stable(feature = "rust1", since = "1.0.0")]
@@ -1642,7 +1648,13 @@ impl<I> DoubleEndedIterator for Rev<I> where I: DoubleEndedIterator {
     fn next_back(&mut self) -> Option<<I as Iterator>::Item> { self.iter.next() }
 }
 
-/// An iterator that clones the elements of an underlying iterator
+/// An iterator that clones the elements of an underlying iterator.
+///
+/// This `struct` is created by the [`cloned()`] method on [`Iterator`]. See its
+/// documentation for more.
+///
+/// [`cloned()`]: trait.Iterator.html#method.cloned
+/// [`Iterator`]: trait.Iterator.html
 #[stable(feature = "iter_cloned", since = "1.1.0")]
 #[must_use = "iterator adaptors are lazy and do nothing unless consumed"]
 #[derive(Clone)]
@@ -1679,7 +1691,13 @@ impl<'a, I, T: 'a> ExactSizeIterator for Cloned<I>
     where I: ExactSizeIterator<Item=&'a T>, T: Clone
 {}
 
-/// An iterator that repeats endlessly
+/// An iterator that repeats endlessly.
+///
+/// This `struct` is created by the [`cycle()`] method on [`Iterator`]. See its
+/// documentation for more.
+///
+/// [`cycle()`]: trait.Iterator.html#method.cycle
+/// [`Iterator`]: trait.Iterator.html
 #[derive(Clone)]
 #[must_use = "iterator adaptors are lazy and do nothing unless consumed"]
 #[stable(feature = "rust1", since = "1.0.0")]
@@ -1711,7 +1729,13 @@ impl<I> Iterator for Cycle<I> where I: Clone + Iterator {
     }
 }
 
-/// An iterator that strings two iterators together
+/// An iterator that strings two iterators together.
+///
+/// This `struct` is created by the [`chain()`] method on [`Iterator`]. See its
+/// documentation for more.
+///
+/// [`chain()`]: trait.Iterator.html#method.chain
+/// [`Iterator`]: trait.Iterator.html
 #[derive(Clone)]
 #[must_use = "iterator adaptors are lazy and do nothing unless consumed"]
 #[stable(feature = "rust1", since = "1.0.0")]
@@ -1849,7 +1873,13 @@ impl<A, B> DoubleEndedIterator for Chain<A, B> where
     }
 }
 
-/// An iterator that iterates two other iterators simultaneously
+/// An iterator that iterates two other iterators simultaneously.
+///
+/// This `struct` is created by the [`zip()`] method on [`Iterator`]. See its
+/// documentation for more.
+///
+/// [`zip()`]: trait.Iterator.html#method.zip
+/// [`Iterator`]: trait.Iterator.html
 #[derive(Clone)]
 #[must_use = "iterator adaptors are lazy and do nothing unless consumed"]
 #[stable(feature = "rust1", since = "1.0.0")]
@@ -1915,7 +1945,13 @@ impl<A, B> DoubleEndedIterator for Zip<A, B> where
     }
 }
 
-/// An iterator that maps the values of `iter` with `f`
+/// An iterator that maps the values of `iter` with `f`.
+///
+/// This `struct` is created by the [`map()`] method on [`Iterator`]. See its
+/// documentation for more.
+///
+/// [`map()`]: trait.Iterator.html#method.map
+/// [`Iterator`]: trait.Iterator.html
 #[must_use = "iterator adaptors are lazy and do nothing unless consumed"]
 #[stable(feature = "rust1", since = "1.0.0")]
 #[derive(Clone)]
@@ -1949,7 +1985,13 @@ impl<B, I: DoubleEndedIterator, F> DoubleEndedIterator for Map<I, F> where
     }
 }
 
-/// An iterator that filters the elements of `iter` with `predicate`
+/// An iterator that filters the elements of `iter` with `predicate`.
+///
+/// This `struct` is created by the [`filter()`] method on [`Iterator`]. See its
+/// documentation for more.
+///
+/// [`filter()`]: trait.Iterator.html#method.filter
+/// [`Iterator`]: trait.Iterator.html
 #[must_use = "iterator adaptors are lazy and do nothing unless consumed"]
 #[stable(feature = "rust1", since = "1.0.0")]
 #[derive(Clone)]
@@ -1994,7 +2036,13 @@ impl<I: DoubleEndedIterator, P> DoubleEndedIterator for Filter<I, P>
     }
 }
 
-/// An iterator that uses `f` to both filter and map elements from `iter`
+/// An iterator that uses `f` to both filter and map elements from `iter`.
+///
+/// This `struct` is created by the [`filter_map()`] method on [`Iterator`]. See its
+/// documentation for more.
+///
+/// [`filter_map()`]: trait.Iterator.html#method.filter_map
+/// [`Iterator`]: trait.Iterator.html
 #[must_use = "iterator adaptors are lazy and do nothing unless consumed"]
 #[stable(feature = "rust1", since = "1.0.0")]
 #[derive(Clone)]
@@ -2041,7 +2089,13 @@ impl<B, I: DoubleEndedIterator, F> DoubleEndedIterator for FilterMap<I, F>
     }
 }
 
-/// An iterator that yields the current count and the element during iteration
+/// An iterator that yields the current count and the element during iteration.
+///
+/// This `struct` is created by the [`enumerate()`] method on [`Iterator`]. See its
+/// documentation for more.
+///
+/// [`enumerate()`]: trait.Iterator.html#method.enumerate
+/// [`Iterator`]: trait.Iterator.html
 #[derive(Clone)]
 #[must_use = "iterator adaptors are lazy and do nothing unless consumed"]
 #[stable(feature = "rust1", since = "1.0.0")]
@@ -2108,7 +2162,14 @@ impl<I> DoubleEndedIterator for Enumerate<I> where
     }
 }
 
-/// An iterator with a `peek()` that returns an optional reference to the next element.
+/// An iterator with a `peek()` that returns an optional reference to the next
+/// element.
+///
+/// This `struct` is created by the [`peekable()`] method on [`Iterator`]. See its
+/// documentation for more.
+///
+/// [`peekable()`]: trait.Iterator.html#method.peekable
+/// [`Iterator`]: trait.Iterator.html
 #[derive(Clone)]
 #[must_use = "iterator adaptors are lazy and do nothing unless consumed"]
 #[stable(feature = "rust1", since = "1.0.0")]
@@ -2190,7 +2251,13 @@ impl<I: Iterator> Peekable<I> {
     }
 }
 
-/// An iterator that rejects elements while `predicate` is true
+/// An iterator that rejects elements while `predicate` is true.
+///
+/// This `struct` is created by the [`skip_while()`] method on [`Iterator`]. See its
+/// documentation for more.
+///
+/// [`skip_while()`]: trait.Iterator.html#method.skip_while
+/// [`Iterator`]: trait.Iterator.html
 #[must_use = "iterator adaptors are lazy and do nothing unless consumed"]
 #[stable(feature = "rust1", since = "1.0.0")]
 #[derive(Clone)]
@@ -2224,7 +2291,13 @@ impl<I: Iterator, P> Iterator for SkipWhile<I, P>
     }
 }
 
-/// An iterator that only accepts elements while `predicate` is true
+/// An iterator that only accepts elements while `predicate` is true.
+///
+/// This `struct` is created by the [`take_while()`] method on [`Iterator`]. See its
+/// documentation for more.
+///
+/// [`take_while()`]: trait.Iterator.html#method.take_while
+/// [`Iterator`]: trait.Iterator.html
 #[must_use = "iterator adaptors are lazy and do nothing unless consumed"]
 #[stable(feature = "rust1", since = "1.0.0")]
 #[derive(Clone)]
@@ -2264,6 +2337,12 @@ impl<I: Iterator, P> Iterator for TakeWhile<I, P>
 }
 
 /// An iterator that skips over `n` elements of `iter`.
+///
+/// This `struct` is created by the [`skip()`] method on [`Iterator`]. See its
+/// documentation for more.
+///
+/// [`skip()`]: trait.Iterator.html#method.skip
+/// [`Iterator`]: trait.Iterator.html
 #[derive(Clone)]
 #[must_use = "iterator adaptors are lazy and do nothing unless consumed"]
 #[stable(feature = "rust1", since = "1.0.0")]
@@ -2338,6 +2417,12 @@ impl<I> Iterator for Skip<I> where I: Iterator {
 impl<I> ExactSizeIterator for Skip<I> where I: ExactSizeIterator {}
 
 /// An iterator that only iterates over the first `n` iterations of `iter`.
+///
+/// This `struct` is created by the [`take()`] method on [`Iterator`]. See its
+/// documentation for more.
+///
+/// [`take()`]: trait.Iterator.html#method.take
+/// [`Iterator`]: trait.Iterator.html
 #[derive(Clone)]
 #[must_use = "iterator adaptors are lazy and do nothing unless consumed"]
 #[stable(feature = "rust1", since = "1.0.0")]
@@ -2393,7 +2478,13 @@ impl<I> Iterator for Take<I> where I: Iterator{
 impl<I> ExactSizeIterator for Take<I> where I: ExactSizeIterator {}
 
 
-/// An iterator to maintain state while iterating another iterator
+/// An iterator to maintain state while iterating another iterator.
+///
+/// This `struct` is created by the [`scan()`] method on [`Iterator`]. See its
+/// documentation for more.
+///
+/// [`scan()`]: trait.Iterator.html#method.scan
+/// [`Iterator`]: trait.Iterator.html
 #[must_use = "iterator adaptors are lazy and do nothing unless consumed"]
 #[stable(feature = "rust1", since = "1.0.0")]
 #[derive(Clone)]
@@ -2422,9 +2513,14 @@ impl<B, I, St, F> Iterator for Scan<I, St, F> where
     }
 }
 
-/// An iterator that maps each element to an iterator,
-/// and yields the elements of the produced iterators
+/// An iterator that maps each element to an iterator, and yields the elements
+/// of the produced iterators.
 ///
+/// This `struct` is created by the [`flat_map()`] method on [`Iterator`]. See its
+/// documentation for more.
+///
+/// [`flat_map()`]: trait.Iterator.html#method.flat_map
+/// [`Iterator`]: trait.Iterator.html
 #[must_use = "iterator adaptors are lazy and do nothing unless consumed"]
 #[stable(feature = "rust1", since = "1.0.0")]
 #[derive(Clone)]
@@ -2493,8 +2589,11 @@ impl<I: DoubleEndedIterator, U, F> DoubleEndedIterator for FlatMap<I, U, F> wher
 /// An iterator that yields `None` forever after the underlying iterator
 /// yields `None` once.
 ///
-/// These can be created through
-/// [`iter.fuse()`](trait.Iterator.html#method.fuse).
+/// This `struct` is created by the [`fuse()`] method on [`Iterator`]. See its
+/// documentation for more.
+///
+/// [`fuse()`]: trait.Iterator.html#method.fuse
+/// [`Iterator`]: trait.Iterator.html
 #[derive(Clone)]
 #[must_use = "iterator adaptors are lazy and do nothing unless consumed"]
 #[stable(feature = "rust1", since = "1.0.0")]
@@ -2574,8 +2673,14 @@ impl<I> DoubleEndedIterator for Fuse<I> where I: DoubleEndedIterator {
 #[stable(feature = "rust1", since = "1.0.0")]
 impl<I> ExactSizeIterator for Fuse<I> where I: ExactSizeIterator {}
 
-/// An iterator that calls a function with a reference to each
-/// element before yielding it.
+/// An iterator that calls a function with a reference to each element before
+/// yielding it.
+///
+/// This `struct` is created by the [`inspect()`] method on [`Iterator`]. See its
+/// documentation for more.
+///
+/// [`inspect()`]: trait.Iterator.html#method.inspect
+/// [`Iterator`]: trait.Iterator.html
 #[must_use = "iterator adaptors are lazy and do nothing unless consumed"]
 #[stable(feature = "rust1", since = "1.0.0")]
 #[derive(Clone)]
@@ -3009,7 +3114,11 @@ impl<A: Step + One> Iterator for ops::RangeFrom<A> where
     }
 }
 
-/// An iterator that repeats an element endlessly
+/// An iterator that repeats an element endlessly.
+///
+/// This `struct` is created by the [`repeat()`] function. See its documentation for more.
+///
+/// [`repeat()`]: fn.repeat.html
 #[derive(Clone)]
 #[stable(feature = "rust1", since = "1.0.0")]
 pub struct Repeat<A> {
@@ -3032,7 +3141,52 @@ impl<A: Clone> DoubleEndedIterator for Repeat<A> {
     fn next_back(&mut self) -> Option<A> { Some(self.element.clone()) }
 }
 
-/// Creates a new iterator that endlessly repeats the element `elt`.
+/// Creates a new iterator that endlessly repeats a single element.
+///
+/// The `repeat()` function repeats a single value over and over and over and
+/// over and over and 🔁.
+///
+/// Infinite iterators like `repeat()` are often used with adapters like
+/// [`take()`], in order to make them finite.
+///
+/// [`take()`]: trait.Iterator.html#method.take
+///
+/// # Examples
+///
+/// Basic usage:
+///
+/// ```
+/// use std::iter;
+///
+/// // the number four 4ever:
+/// let mut fours = iter::repeat(4);
+///
+/// assert_eq!(Some(4), fours.next());
+/// assert_eq!(Some(4), fours.next());
+/// assert_eq!(Some(4), fours.next());
+/// assert_eq!(Some(4), fours.next());
+/// assert_eq!(Some(4), fours.next());
+///
+/// // yup, still four
+/// assert_eq!(Some(4), fours.next());
+/// ```
+///
+/// Going finite with [`take()`]:
+///
+/// ```
+/// use std::iter;
+///
+/// // that last example was too many fours. Let's only have four fours.
+/// let mut four_fours = iter::repeat(4).take(4);
+///
+/// assert_eq!(Some(4), four_fours.next());
+/// assert_eq!(Some(4), four_fours.next());
+/// assert_eq!(Some(4), four_fours.next());
+/// assert_eq!(Some(4), four_fours.next());
+///
+/// // ... and now we're done
+/// assert_eq!(None, four_fours.next());
+/// ```
 #[inline]
 #[stable(feature = "rust1", since = "1.0.0")]
 pub fn repeat<T: Clone>(elt: T) -> Repeat<T> {
@@ -3040,6 +3194,10 @@ pub fn repeat<T: Clone>(elt: T) -> Repeat<T> {
 }
 
 /// An iterator that yields nothing.
+///
+/// This `struct` is created by the [`empty()`] function. See its documentation for more.
+///
+/// [`empty()`]: fn.empty.html
 #[stable(feature = "iter_empty", since = "1.2.0")]
 pub struct Empty<T>(marker::PhantomData<T>);
 
@@ -3089,12 +3247,29 @@ impl<T> Default for Empty<T> {
 }
 
 /// Creates an iterator that yields nothing.
+///
+/// # Examples
+///
+/// Basic usage:
+///
+/// ```
+/// use std::iter;
+///
+/// // this could have been an iterator over i32, but alas, it's just not.
+/// let mut nope = iter::empty::<i32>();
+///
+/// assert_eq!(None, nope.next());
+/// ```
 #[stable(feature = "iter_empty", since = "1.2.0")]
 pub fn empty<T>() -> Empty<T> {
     Empty(marker::PhantomData)
 }
 
 /// An iterator that yields an element exactly once.
+///
+/// This `struct` is created by the [`once()`] function. See its documentation for more.
+///
+/// [`once()`]: fn.once.html
 #[derive(Clone)]
 #[stable(feature = "iter_once", since = "1.2.0")]
 pub struct Once<T> {
@@ -3129,6 +3304,56 @@ impl<T> ExactSizeIterator for Once<T> {
 }
 
 /// Creates an iterator that yields an element exactly once.
+///
+/// This is commonly used to adapt a single value into a [`chain()`] of other
+/// kinds of iteration. Maybe you have an iterator that covers almost
+/// everything, but you need an extra special case. Maybe you have a function
+/// which works on iterators, but you only need to process one value.
+///
+/// [`chain()`]: trait.Iterator.html#method.chain
+///
+/// # Examples
+///
+/// Basic usage:
+///
+/// ```
+/// use std::iter;
+///
+/// // one is the loneliest number
+/// let mut one = iter::once(1);
+///
+/// assert_eq!(Some(1), one.next());
+///
+/// // just one, that's all we get
+/// assert_eq!(None, one.next());
+/// ```
+///
+/// Chaining together with another iterator. Let's say that we want to iterate
+/// over each file of the `.foo` directory, but also a configuration file,
+/// `.foorc`:
+///
+/// ```no_run
+/// use std::iter;
+/// use std::fs;
+/// use std::path::PathBuf;
+///
+/// let dirs = fs::read_dir(".foo").unwrap();
+///
+/// // we need to convert from an iterator of DirEntry-s to an iterator of
+/// // PathBufs, so we use map
+/// let dirs = dirs.map(|file| file.unwrap().path());
+///
+/// // now, our iterator just for our config file
+/// let config = iter::once(PathBuf::from(".foorc"));
+///
+/// // chain the two iterators together into one big iterator
+/// let files = dirs.chain(config);
+///
+/// // this will give us all of the files in .foo as well as .foorc
+/// for f in files {
+///     println!("{:?}", f);
+/// }
+/// ```
 #[stable(feature = "iter_once", since = "1.2.0")]
 pub fn once<T>(value: T) -> Once<T> {
     Once { inner: Some(value).into_iter() }

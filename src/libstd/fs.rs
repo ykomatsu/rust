@@ -60,6 +60,7 @@ pub struct File {
 /// represents known metadata about a file such as its permissions, size,
 /// modification times, etc.
 #[stable(feature = "rust1", since = "1.0.0")]
+#[derive(Clone)]
 pub struct Metadata(fs_imp::FileAttr);
 
 /// Iterator over the entries in a directory.
@@ -2160,5 +2161,11 @@ mod tests {
                 f => panic!("unknown file name: {:?}", f),
             }
         }
+    }
+
+    #[test]
+    fn read_dir_not_found() {
+        let res = fs::read_dir("/path/that/does/not/exist");
+        assert_eq!(res.err().unwrap().kind(), ErrorKind::NotFound);
     }
 }

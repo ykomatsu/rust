@@ -279,11 +279,11 @@ fn extension(file_name: &str) -> Option<&str> {
 }
 ```
 
-One other pattern that we find is very common is assigning a default value to
-the case when an `Option` value is `None`. For example, maybe your program
-assumes that the extension of a file is `rs` even if none is present. As you
-might imagine, the case analysis for this is not specific to file
-extensions - it can work with any `Option<T>`:
+One other pattern we commonly find is assigning a default value to the case
+when an `Option` value is `None`. For example, maybe your program assumes that
+the extension of a file is `rs` even if none is present. As you might imagine,
+the case analysis for this is not specific to file extensions - it can work
+with any `Option<T>`:
 
 ```rust
 fn unwrap_or<T>(option: Option<T>, default: T) -> T {
@@ -1898,7 +1898,7 @@ for pop in search(&data_file, &city) {
 
 In this piece of code, we take `file` (which has the type
 `Option<String>`), and convert it to a type that `search` can use, in
-this case, `&Option<AsRef<Path>>`. Do do this, we take a reference of
+this case, `&Option<AsRef<Path>>`. To do this, we take a reference of
 file, and map `Path::new` onto it. In this case, `as_ref()` converts
 the `Option<String>` into an `Option<&str>`, and from there, we can
 execute `Path::new` to the content of the optional, and return the

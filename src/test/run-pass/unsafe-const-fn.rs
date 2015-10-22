@@ -8,7 +8,24 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
+// A quick test of 'unsafe const fn' functionality
+
+#![feature(const_fn)]
+
+unsafe const fn dummy(v: u32) -> u32 {
+    !v
+}
+
+struct Type;
+impl Type {
+    unsafe const fn new() -> Type {
+        Type
+    }
+}
+
+const VAL: u32 = unsafe { dummy(0xFFFF) };
+const TYPE_INST: Type = unsafe { Type::new() };
+
 fn main() {
-    let c = push_unsafe!('c'); //~ ERROR push/pop_unsafe macros are experimental
-    let c = pop_unsafe!('c'); //~ ERROR push/pop_unsafe macros are experimental
+    assert_eq!(VAL, 0xFFFF0000);
 }

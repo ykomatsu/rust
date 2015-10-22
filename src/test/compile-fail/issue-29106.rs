@@ -8,12 +8,27 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-// Empty struct defined with braces shouldn't add names into value namespace
+use std::rc::Rc;
+use std::sync::Arc;
 
-#![feature(braced_empty_structs)]
+struct Foo<'a>(&'a String);
 
-struct Empty {}
+impl<'a> Drop for Foo<'a> {
+    fn drop(&mut self) {
+        println!("{:?}", self.0);
+    }
+}
 
 fn main() {
-    let e = Empty; //~ ERROR `Empty` is the name of a struct or struct variant
+    {
+        let (y, x);
+        x = "alive".to_string();
+        y = Arc::new(Foo(&x)); //~ ERROR `x` does not live long enough
+    }
+
+    {
+        let (y, x);
+        x = "alive".to_string();
+        y = Rc::new(Foo(&x)); //~ ERROR `x` does not live long enough
+    }
 }

@@ -6,7 +6,7 @@ interacted with the *outlives* relationship in an inclusive manner. That is,
 when we talked about `'a: 'b`, it was ok for `'a` to live *exactly* as long as
 `'b`. At first glance, this seems to be a meaningless distinction. Nothing ever
 gets dropped at the same time as another, right? This is why we used the
-following desugarring of `let` statements:
+following desugaring of `let` statements:
 
 ```rust,ignore
 let x;
@@ -220,6 +220,7 @@ checking the implicit assertion that no potentially expired data
 It is sometimes obvious that no such access can occur, like the case above.
 However, when dealing with a generic type parameter, such access can
 occur indirectly. Examples of such indirect access are:
+
  * invoking a callback,
  * via a trait method call.
 

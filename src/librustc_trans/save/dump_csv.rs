@@ -66,10 +66,10 @@ pub struct DumpCsvVisitor<'l, 'tcx: 'l> {
     save_ctxt: SaveContext<'l, 'tcx>,
     sess: &'l Session,
     tcx: &'l ty::ctxt<'tcx>,
-    analysis: &'l ty::CrateAnalysis,
+    analysis: &'l ty::CrateAnalysis<'l>,
 
     span: SpanUtils<'l>,
-    fmt: FmtStrs<'l>,
+    fmt: FmtStrs<'l, 'tcx>,
 
     cur_scope: NodeId,
 }
@@ -77,7 +77,7 @@ pub struct DumpCsvVisitor<'l, 'tcx: 'l> {
 impl <'l, 'tcx> DumpCsvVisitor<'l, 'tcx> {
     pub fn new(tcx: &'l ty::ctxt<'tcx>,
                lcx: &'l LoweringContext<'l>,
-               analysis: &'l ty::CrateAnalysis,
+               analysis: &'l ty::CrateAnalysis<'l>,
                output_file: Box<File>)
                -> DumpCsvVisitor<'l, 'tcx> {
         let span_utils = SpanUtils::new(&tcx.sess);
@@ -91,7 +91,8 @@ impl <'l, 'tcx> DumpCsvVisitor<'l, 'tcx> {
                                   out: output_file,
                                   dump_spans: false,
                               },
-                              span_utils),
+                              span_utils,
+                              tcx),
             cur_scope: 0,
         }
     }
@@ -458,26 +459,22 @@ impl <'l, 'tcx> DumpCsvVisitor<'l, 'tcx> {
 
     fn process_struct(&mut self,
                       item: &ast::Item,
-                      def: &ast::StructDef,
+                      def: &ast::VariantData,
                       ty_params: &ast::Generics) {
         let qualname = format!("::{}", self.tcx.map.path_to_string(item.id));
 
-        let ctor_id = match def.ctor_id {
-            Some(node_id) => node_id,
-            None => ast::DUMMY_NODE_ID,
-        };
         let val = self.span.snippet(item.span);
         let sub_span = self.span.sub_span_after_keyword(item.span, keywords::Struct);
         self.fmt.struct_str(item.span,
                             sub_span,
                             item.id,
-                            ctor_id,
+                            def.id(),
                             &qualname,
                             self.cur_scope,
                             &val);
 
         // fields
-        for field in &def.fields {
+        for field in def.fields() {
             self.process_struct_field_def(field, item.id);
             self.visit_ty(&field.node.ty);
         }
@@ -504,40 +501,19 @@ impl <'l, 'tcx> DumpCsvVisitor<'l, 'tcx> {
             qualname.push_str("::");
             qualname.push_str(name);
             let val = self.span.snippet(variant.span);
-            match variant.node.kind {
-                ast::TupleVariantKind(ref args) => {
-                    // first ident in span is the variant's name
-                    self.fmt.tuple_variant_str(variant.span,
-                                               self.span.span_for_first_ident(variant.span),
-                                               variant.node.id,
-                                               name,
-                                               &qualname,
-                                               &enum_data.qualname,
-                                               &val,
-                                               enum_data.id);
-                    for arg in args {
-                        self.visit_ty(&*arg.ty);
-                    }
-                }
-                ast::StructVariantKind(ref struct_def) => {
-                    let ctor_id = match struct_def.ctor_id {
-                        Some(node_id) => node_id,
-                        None => ast::DUMMY_NODE_ID,
-                    };
-                    self.fmt.struct_variant_str(variant.span,
-                                                self.span.span_for_first_ident(variant.span),
-                                                variant.node.id,
-                                                ctor_id,
-                                                &qualname,
-                                                &enum_data.qualname,
-                                                &val,
-                                                enum_data.id);
 
-                    for field in &struct_def.fields {
-                        self.process_struct_field_def(field, variant.node.id);
-                        self.visit_ty(&*field.node.ty);
-                    }
-                }
+            self.fmt.struct_variant_str(variant.span,
+                                        self.span.span_for_first_ident(variant.span),
+                                        variant.node.data.id(),
+                                        variant.node.data.id(),
+                                        &qualname,
+                                        &enum_data.qualname,
+                                        &val,
+                                        enum_data.id);
+
+            for field in variant.node.data.fields() {
+                self.process_struct_field_def(field, variant.node.data.id());
+                self.visit_ty(&*field.node.ty);
             }
         }
         self.process_generic_params(ty_params, item.span, &enum_data.qualname, enum_data.id);

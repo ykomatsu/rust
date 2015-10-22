@@ -89,7 +89,6 @@ use libc::c_uint;
 use std::ffi::{CStr, CString};
 use std::cell::{Cell, RefCell};
 use std::collections::{HashMap, HashSet};
-use std::mem;
 use std::str;
 use std::{i8, i16, i32, i64};
 use syntax::abi::{Rust, RustCall, RustIntrinsic, PlatformIntrinsic, Abi};
@@ -2125,7 +2124,10 @@ pub fn trans_item(ccx: &CrateContext, item: &hir::Item) {
           let mut v = TransItemVisitor{ ccx: ccx };
           v.visit_expr(&**expr);
 
-          let g = consts::trans_static(ccx, m, expr, item.id, &item.attrs);
+          let g = match consts::trans_static(ccx, m, expr, item.id, &item.attrs) {
+              Ok(g) => g,
+              Err(err) => ccx.tcx().sess.span_fatal(expr.span, &err.description()),
+          };
           set_global_section(ccx, g, item);
           update_linkage(ccx, g, Some(item.id), OriginalTranslation);
       },
@@ -2428,13 +2430,12 @@ pub fn get_item_val(ccx: &CrateContext, id: ast::NodeId) -> ValueRef {
 
         hir_map::NodeVariant(ref v) => {
             let llfn;
-            let args = match v.node.kind {
-                hir::TupleVariantKind(ref args) => args,
-                hir::StructVariantKind(_) => {
-                    ccx.sess().bug("struct variant kind unexpected in get_item_val")
-                }
+            let fields = if v.node.data.is_struct() {
+                ccx.sess().bug("struct variant kind unexpected in get_item_val")
+            } else {
+                v.node.data.fields()
             };
-            assert!(!args.is_empty());
+            assert!(fields.count() != 0);
             let ty = ccx.tcx().node_id_to_type(id);
             let parent = ccx.tcx().map.get_parent(id);
             let enm = ccx.tcx().map.expect_item(parent);
@@ -2455,12 +2456,11 @@ pub fn get_item_val(ccx: &CrateContext, id: ast::NodeId) -> ValueRef {
 
         hir_map::NodeStructCtor(struct_def) => {
             // Only register the constructor if this is a tuple-like struct.
-            let ctor_id = match struct_def.ctor_id {
-                None => {
-                    ccx.sess().bug("attempt to register a constructor of \
-                                    a non-tuple-like struct")
-                }
-                Some(ctor_id) => ctor_id,
+            let ctor_id = if struct_def.is_struct() {
+                ccx.sess().bug("attempt to register a constructor of \
+                                  a non-tuple-like struct")
+            } else {
+                struct_def.id()
             };
             let parent = ccx.tcx().map.get_parent(id);
             let struct_item = ccx.tcx().map.expect_item(parent);
@@ -2663,11 +2663,7 @@ impl Iterator for ValueIter {
     fn next(&mut self) -> Option<ValueRef> {
         let old = self.cur;
         if !old.is_null() {
-            self.cur = unsafe {
-                let step: unsafe extern "C" fn(ValueRef) -> ValueRef =
-                    mem::transmute_copy(&self.step);
-                step(old)
-            };
+            self.cur = unsafe { (self.step)(old) };
             Some(old)
         } else {
             None

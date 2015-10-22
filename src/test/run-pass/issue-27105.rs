@@ -8,14 +8,17 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-// Feature gate test for empty struct with braces
+use std::cell::RefCell;
+use std::rc::Rc;
 
-struct Empty {} //~ ERROR empty structs with braces are unstable
+pub struct Callbacks {
+    callbacks: Vec<Rc<RefCell<FnMut(i32)>>>,
+}
 
-fn main() {
-    let e = Empty {}; //~ ERROR empty structs with braces are unstable
-
-    match e {
-        Empty {} => {} //~ ERROR empty structs with braces are unstable
+impl Callbacks {
+    pub fn register<F: FnMut(i32)+'static>(&mut self, callback: F) {
+        self.callbacks.push(Rc::new(RefCell::new(callback)));
     }
 }
+
+fn main() {}

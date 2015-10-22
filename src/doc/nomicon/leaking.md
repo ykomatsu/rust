@@ -90,7 +90,7 @@ let mut vec = vec![Box::new(0); 4];
 println!("{}", vec[0]);
 ```
 
-This is pretty clearly Not Good. Unfortunately, we're kind've stuck between a
+This is pretty clearly Not Good. Unfortunately, we're kind of stuck between a
 rock and a hard place: maintaining consistent state at every step has an
 enormous cost (and would negate any benefits of the API). Failing to maintain
 consistent state gives us Undefined Behavior in safe code (making the API
@@ -135,7 +135,7 @@ impl<T> Rc<T> {
     fn new(data: T) -> Self {
         unsafe {
             // Wouldn't it be nice if heap::allocate worked like this?
-            let ptr = heap::allocate<RcBox<T>>();
+            let ptr = heap::allocate::<RcBox<T>>();
             ptr::write(ptr, RcBox {
                 data: data,
                 ref_count: 1,
@@ -248,4 +248,4 @@ let mut data = Box::new(0);
 ```
 
 Dang. Here the destructor running was pretty fundamental to the API, and it had
-to be scrapped in favour of a completely different design.
+to be scrapped in favor of a completely different design.

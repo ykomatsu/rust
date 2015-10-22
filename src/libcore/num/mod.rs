@@ -17,6 +17,7 @@ use self::wrapping::OverflowingOps;
 
 use char::CharExt;
 use cmp::{Eq, PartialOrd};
+use convert::From;
 use fmt;
 use intrinsics;
 use marker::{Copy, Sized};
@@ -403,12 +404,12 @@ macro_rules! int_impl {
         /// ```
         #[stable(feature = "rust1", since = "1.0.0")]
         #[inline]
-        pub fn checked_div(self, v: Self) -> Option<Self> {
-            match v {
-                0   => None,
+        pub fn checked_div(self, other: Self) -> Option<Self> {
+            match other {
+                0    => None,
                -1 if self == Self::min_value()
-                    => None,
-                v   => Some(self / v),
+                     => None,
+               other => Some(self / other),
             }
         }
 
@@ -972,10 +973,10 @@ macro_rules! uint_impl {
         /// ```
         #[stable(feature = "rust1", since = "1.0.0")]
         #[inline]
-        pub fn checked_div(self, v: Self) -> Option<Self> {
-            match v {
+        pub fn checked_div(self, other: Self) -> Option<Self> {
+            match other {
                 0 => None,
-                v => Some(self / v),
+                other => Some(self / other),
             }
         }
 
@@ -1471,3 +1472,45 @@ impl fmt::Display for ParseIntError {
 }
 
 pub use num::dec2flt::ParseFloatError;
+
+// Conversion traits for primitive integer types
+// Conversions T -> T are covered by a blanket impl and therefore excluded
+// Some conversions from and to usize/isize are not implemented due to portability concerns
+macro_rules! impl_from {
+    ($Small: ty, $Large: ty) => {
+        #[stable(feature = "lossless_int_conv", since = "1.5.0")]
+        impl From<$Small> for $Large {
+            #[stable(feature = "lossless_int_conv", since = "1.5.0")]
+            #[inline]
+            fn from(small: $Small) -> $Large {
+                small as $Large
+            }
+        }
+    }
+}
+
+// Unsigned -> Unsigned
+impl_from! { u8, u16 }
+impl_from! { u8, u32 }
+impl_from! { u8, u64 }
+impl_from! { u8, usize }
+impl_from! { u16, u32 }
+impl_from! { u16, u64 }
+impl_from! { u32, u64 }
+
+// Signed -> Signed
+impl_from! { i8, i16 }
+impl_from! { i8, i32 }
+impl_from! { i8, i64 }
+impl_from! { i8, isize }
+impl_from! { i16, i32 }
+impl_from! { i16, i64 }
+impl_from! { i32, i64 }
+
+// Unsigned -> Signed
+impl_from! { u8, i16 }
+impl_from! { u8, i32 }
+impl_from! { u8, i64 }
+impl_from! { u16, i32 }
+impl_from! { u16, i64 }
+impl_from! { u32, i64 }

@@ -135,7 +135,7 @@ pub fn check_intrinsics(ccx: &CrateContext) {
 
             if transmute_restriction.original_from != transmute_restriction.substituted_from {
                 span_transmute_size_error(ccx.sess(), transmute_restriction.span,
-                    &format!("transmute called on types with potentially different sizes: \
+                    &format!("transmute called with differently sized types: \
                               {} (could be {} bit{}) to {} (could be {} bit{})",
                              transmute_restriction.original_from,
                              from_type_size as usize,
@@ -145,7 +145,7 @@ pub fn check_intrinsics(ccx: &CrateContext) {
                              if to_type_size == 1 {""} else {"s"}));
             } else {
                 span_transmute_size_error(ccx.sess(), transmute_restriction.span,
-                    &format!("transmute called on types with different sizes: \
+                    &format!("transmute called with differently sized types: \
                               {} ({} bit{}) to {} ({} bit{})",
                              transmute_restriction.original_from,
                              from_type_size as usize,
@@ -1563,7 +1563,16 @@ fn generic_simd_intrinsic<'blk, 'tcx, 'a>
             None => bcx.sess().span_bug(call_info.span,
                                         "intrinsic call with unexpected argument shape"),
         };
-        let vector = consts::const_expr(bcx.ccx(), vector, tcx.mk_substs(substs), None).0;
+        let vector = match consts::const_expr(
+            bcx.ccx(),
+            vector,
+            tcx.mk_substs(substs),
+            None,
+            consts::TrueConst::Yes, // this should probably help simd error reporting
+        ) {
+            Ok((vector, _)) => vector,
+            Err(err) => bcx.sess().span_fatal(call_info.span, &err.description()),
+        };
 
         let indices: Option<Vec<_>> = (0..n)
             .map(|i| {
