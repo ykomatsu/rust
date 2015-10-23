@@ -1,9 +1,8 @@
-% Inline Assembly
+% インラインアセンブリー
 
-For extremely low-level manipulations and performance reasons, one
-might wish to control the CPU directly. Rust supports using inline
-assembly to do this via the `asm!` macro. The syntax roughly matches
-that of GCC & Clang:
+極めて低レベルの作業のためや性能上の理由のために、CPUを直接制御したいと思うかもしれません。
+Rustはこれを行うために`asm!`マクロによるインラインアセンブリーの使用をサポートします。
+構文はGCCとClangのそれと大体一致します。
 
 ```ignore
 asm!(assembly template
@@ -14,16 +13,13 @@ asm!(assembly template
    );
 ```
 
-Any use of `asm` is feature gated (requires `#![feature(asm)]` on the
-crate to allow) and of course requires an `unsafe` block.
+`asm`の使用は全て（許可するためにクレートでの`#![feature(asm)]`を要求する）機能ゲートの内側にあり、もちろん`unsafe`ブロックを要求します。
 
-> **Note**: the examples here are given in x86/x86-64 assembly, but
-> all platforms are supported.
+> **注意** ：ここでの例はx86/x86-64アセンブリーで与えられますが、全てのプラットフォームがサポートされています。
 
-## Assembly template
+## アセンブリーテンプレート
 
-The `assembly template` is the only required parameter and must be a
-literal string (i.e. `""`)
+`assembly template`は唯一要求される引数で、リテラル文字列（つまり`""`）でなければなりません。
 
 ```rust
 #![feature(asm)]
@@ -46,10 +42,9 @@ fn main() {
 }
 ```
 
-(The `feature(asm)` and `#[cfg]`s are omitted from now on.)
+（今後は`feature(asm)`と`#[cfg]`を省略します。）
 
-Output operands, input operands, clobbers and options are all optional
-but you must add the right number of `:` if you skip them:
+出力オペランド、入力オペランド、クロバー、オプションは全て任意です。しかし、もしあなたがそれらを飛ばすのであれば、あなたは正しい個数の`:`を付けなければなりません。
 
 ```rust
 # #![feature(asm)]
@@ -63,7 +58,7 @@ asm!("xor %eax, %eax"
 # } }
 ```
 
-Whitespace also doesn't matter:
+ホワイトスペースも問題にはなりません。
 
 ```rust
 # #![feature(asm)]
@@ -73,11 +68,10 @@ asm!("xor %eax, %eax" ::: "{eax}");
 # } }
 ```
 
-## Operands
+## オペランド
 
-Input and output operands follow the same format: `:
-"constraints1"(expr1), "constraints2"(expr2), ..."`. Output operand
-expressions must be mutable lvalues, or not yet assigned:
+入力オペランドと出力オペランドは同じ書式、`: "constraints1"(expr1), "constraints2"(expr2), ..."`に従います。
+出力オペランドの式はミュータブルなlvalueか未割当てのどちらかでなければなりません。
 
 ```rust
 # #![feature(asm)]
@@ -100,11 +94,8 @@ fn main() {
 }
 ```
 
-If you would like to use real operands in this position, however,
-you are required to put curly braces `{}` around the register that
-you want, and you are required to put the specific size of the
-operand. This is useful for very low level programming, where
-which register you use is important:
+しかし、もしあなたがこの位置に実際のオペランドを使いたいのであれば、あなたは波括弧`{}`をあなたの求めるレジスターの周りに書かなければなりません。そして、あなたはオペランドの特定のサイズを書かなければなりません。
+これはあなたが使うレジスターが重要になる、非常に低レベルのプログラミングのために便利です。
 
 ```rust
 # #![feature(asm)]
@@ -116,12 +107,9 @@ result
 # }
 ```
 
-## Clobbers
+## クロバー
 
-Some instructions modify registers which might otherwise have held
-different values so we use the clobbers list to indicate to the
-compiler not to assume any values loaded into those registers will
-stay valid.
+いくつかの命令はレジスターを変更します。それがなければ、そのレジスターは異なる値を保持したままだったかもしれません。そのため、私たちはそれらのレジスターに読み込まれた全ての値が正しいままだとみなさないようにコンパイラーに指示するためにクロバーリストを使います。
 
 ```rust
 # #![feature(asm)]
@@ -132,28 +120,24 @@ asm!("mov $$0x200, %eax" : /* no outputs */ : /* no inputs */ : "{eax}");
 # } }
 ```
 
-Input and output registers need not be listed since that information
-is already communicated by the given constraints. Otherwise, any other
-registers used either implicitly or explicitly should be listed.
+入力レジスターと出力レジスターを一覧に入れる必要はありません。なぜなら、その情報は既に与えられた制約によって伝えられているからです。
+そうでなければ、黙示的にせよ明示的にせよ使われるその他のレジスターは全て一覧に入れるべきです。
 
-If the assembly changes the condition code register `cc` should be
-specified as one of the clobbers. Similarly, if the assembly modifies
-memory, `memory` should also be specified.
+もしアセンブリーが条件コードレジスターを変更するのであれば、`cc`はクロバーの1つとして明示されるべきです。
+同様に、もしアセンブリーがメモリーを変更するのであれば、`memory`も明示されるべきです。
 
-## Options
+## オプション
 
-The last section, `options` is specific to Rust. The format is comma
-separated literal strings (i.e. `:"foo", "bar", "baz"`). It's used to
-specify some extra info about the inline assembly:
+最後のセクション、`options`はRust特有です。
+書式はコンマ区切りのリテラル文字列（つまり、`:"foo", "bar", "baz"`）です。
+それはインラインアセンブリーについての追加の情報を明示するために使われます。
 
-Current valid options are:
+現在の正しいオプションは次のとおりです。
 
-1. *volatile* - specifying this is analogous to
-   `__asm__ __volatile__ (...)` in gcc/clang.
-2. *alignstack* - certain instructions expect the stack to be
-   aligned a certain way (i.e. SSE) and specifying this indicates to
-   the compiler to insert its usual stack alignment code
-3. *intel* - use intel syntax instead of the default AT&T.
+1. *volatile* - この指定はGCCとClangでの`__asm__ __volatile__ (...)`と似たものである
+2. *alignstack* - ある命令はスタックが一定の手順で整列されることを期待する（つまりSSE）。
+   そしてこの指定はその通常のスタック整列コードを挿入することをコンパイラーに指示する
+3. *intel* - デフォルトのAT&Tの代わりにインテルの構文を使う
 
 ```rust
 # #![feature(asm)]
@@ -167,11 +151,8 @@ println!("eax is currently {}", result);
 # }
 ```
 
-## More Information
+## さらなる情報
 
-The current implementation of the `asm!` macro is a direct binding to [LLVM's
-inline assembler expressions][llvm-docs], so be sure to check out [their
-documentation as well][llvm-docs] for more information about clobbers,
-constraints, etc.
+`asm!`マクロの現在の実装は[LLVMのインラインアセンブラー式][llvm-docs]に直接バインドしています。そのため、クロバー、制約などについてのさらなる情報を得るために[それらのドキュメントも][llvm-docs]必ずチェックしましょう。
 
 [llvm-docs]: http://llvm.org/docs/LangRef.html#inline-assembler-expressions

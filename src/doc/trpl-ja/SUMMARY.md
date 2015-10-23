@@ -59,7 +59,7 @@
     * [`unsafe`](unsafe.md)
 * [Nightly Rust](nightly-rust.md)
     * [コンパイラープラグイン](compiler-plugins.md)
-    * [Inline Assembly](inline-assembly.md)
+    * [インラインアセンブラー](inline-assembly.md)
     * [No stdlib](no-stdlib.md)
     * [Intrinsics](intrinsics.md)
     * [Lang items](lang-items.md)
