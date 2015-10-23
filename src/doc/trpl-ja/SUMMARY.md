@@ -24,7 +24,7 @@
     * [変数束縛](variable-bindings.md)
     * [関数](functions.md)
     * [プリミティブ型](primitive-types.md)
-    * [Comments](comments.md)
+    * [コメント](comments.md)
     * [if](if.md)
     * [Loops](loops.md)
     * [Ownership](ownership.md)
