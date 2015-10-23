@@ -1,16 +1,11 @@
-% No stdlib
+% 標準ライブラリーの不使用
 
-By default, `std` is linked to every Rust crate. In some contexts,
-this is undesirable, and can be avoided with the `#![no_std]`
-attribute attached to the crate.
+デフォルトでは、`std`は全てのRustのクレートにリンクされます。
+ある状況ではこれは望ましくありません。そして、これはクレートに`#![no_std]`属性を付けることによって避けることができます。
 
-Obviously there's more to life than just libraries: one can use
-`#[no_std]` with an executable, controlling the entry point is
-possible in two ways: the `#[start]` attribute, or overriding the
-default shim for the C `main` function with your own.
+明らかに、単なるライブラリーよりも大切なものが人生にはあります。`#[no_std]`を実行ファイルに付けて使うことができ、エントリーポイントの制御は2通りの方法で可能です。それは、`#[start]`属性、そしてCの`main`関数のためのデフォルトのシムをあなた独自のもので上書きすることです。
 
-The function marked `#[start]` is passed the command line parameters
-in the same format as C:
+`#[start]`とマークされた関数はCと同じ書式でコマンドライン引数を渡されます。
 
 ```rust
 # #![feature(libc)]
@@ -37,10 +32,7 @@ fn start(_argc: isize, _argv: *const *const u8) -> isize {
 # // fn main() {} tricked you, rustdoc!
 ```
 
-To override the compiler-inserted `main` shim, one has to disable it
-with `#![no_main]` and then create the appropriate symbol with the
-correct ABI and the correct name, which requires overriding the
-compiler's name mangling too:
+コンパイラーの挿入する`main`のシムを上書きするために、それを`#![no_main]`を付けて無効にして、それから正しいABIと正しい名前を付けた適切なシンボルを作成しなければなりません。それは、コンパイラーの名前のマングリングの上書きも要求します。
 
 ```rust
 # #![feature(libc)]
@@ -63,38 +55,26 @@ pub extern fn main(argc: i32, argv: *const *const u8) -> i32 {
 # // fn main() {} tricked you, rustdoc!
 ```
 
+コンパイラーは現在実行ファイルの中で呼び出すことができるシンボルについていくつかのことをみなしています。
+通常はそれらの関数は標準ライブラリーによって提供されますが、それがなければあなたはあなた自身のものを定義しなければなりません。
 
-The compiler currently makes a few assumptions about symbols which are available
-in the executable to call. Normally these functions are provided by the standard
-library, but without it you must define your own.
+それら2つの関数の1つ目、`eh_personality`はコンパイラーの失敗のメカニズムによって使われます。
+これはしばしばGCCのパーソナリティー関数にマップされます（さらなる情報のために[libstdの実装](../std/rt/unwind/index.html)を見ましょう）が、パニックの引き金を持たないクレートはこの関数が決して呼び出されないことを保証することができます。
+2つ目の関数、`panic_fmt`もコンパイラーの失敗のメカニズムによって使われます。
 
-The first of these two functions, `eh_personality`, is used by the
-failure mechanisms of the compiler. This is often mapped to GCC's
-personality function (see the
-[libstd implementation](../std/rt/unwind/index.html) for more
-information), but crates which do not trigger a panic can be assured
-that this function is never called. The second function, `panic_fmt`, is
-also used by the failure mechanisms of the compiler.
+## libcoreの使用
 
-## Using libcore
+> **注意** ：コアライブラリーの構造は不安定です。代わりに標準ライブラリーを使うことが可能な限り推奨されます。
 
-> **Note**: the core library's structure is unstable, and it is recommended to
-> use the standard library instead wherever possible.
+前のテクニックによって私たちはいくつかのRustのコードを実行するベアメタルの実行ファイルを手に入れました。
+標準ライブラリーによって提供される機能にはたくさんのものがありますが、しかし、Rustではそれは生産性を高めるために必要です。
+もし標準ライブラリーが効率的でなければ、そのときは代わりに[libcore](../core/index.html)が使われることが予定されています。
 
-With the above techniques, we've got a bare-metal executable running some Rust
-code. There is a good deal of functionality provided by the standard library,
-however, that is necessary to be productive in Rust. If the standard library is
-not sufficient, then [libcore](../core/index.html) is designed to be used
-instead.
+コアライブラリーの依存関係は非常に少なく、標準ライブラリー自体よりももっとポータブルです。
+加えて、コアライブラリーは慣習的で実践的なRustのコードを書くために必要な機能のほとんどを持ちます。
+`#![no_std]`を使うとき、Rustは私たちが`std`を使うときにそれのために行ったのとちょうど同じように、自動的に`core`クレートを注入します。
 
-The core library has very few dependencies and is much more portable than the
-standard library itself. Additionally, the core library has most of the
-necessary functionality for writing idiomatic and effective Rust code. When
-using `#![no_std]`, Rust will automatically inject the `core` crate, just like
-we do for `std` when we’re using it.
-
-As an example, here is a program that will calculate the dot product of two
-vectors provided from C, using idiomatic Rust practices.
+例として、これはRustの慣習を使って、Cから提供された2つのベクターのドット積を計算するプログラムです。
 
 ```rust
 # #![feature(libc)]
@@ -150,15 +130,9 @@ extern fn panic_fmt(args: &core::fmt::Arguments,
 # fn main() {}
 ```
 
-Note that there is one extra lang item here which differs from the examples
-above, `panic_fmt`. This must be defined by consumers of libcore because the
-core library declares panics, but it does not define it. The `panic_fmt`
-lang item is this crate's definition of panic, and it must be guaranteed to
-never return.
+前の例とは異なり、追加の言語要素が1つあることに注意しましょう。`panic_fmt`です。
+これはlibcoreの利用者によって定義されなければなりません。なぜなら、コアライブラリーはパニックを宣言しますが、それを定義しないからです。
+`panic_fmt`言語要素はこのクレートのパニックの定義で、それは決してリターンしないことが保証されなければなりません。
 
-As can be seen in this example, the core library is intended to provide the
-power of Rust in all circumstances, regardless of platform requirements. Further
-libraries, such as liballoc, add functionality to libcore which make other
-platform-specific assumptions, but continue to be more portable than the
-standard library itself.
-
+この例で見られるように、コアライブラリーはプラットフォームの要求にかかわらず、あらゆる環境でRustの力を提供することを意図しています。
+プラットフォーム特有の他の状況を前提とする、liballocのようなより高機能なライブラリーはlibcoreに機能を追加します。しかし、コアライブラリーは標準ライブラリー自体よりもポータブルであり続けます。

@@ -60,7 +60,7 @@
 * [Nightly Rust](nightly-rust.md)
     * [コンパイラープラグイン](compiler-plugins.md)
     * [インラインアセンブラー](inline-assembly.md)
-    * [No stdlib](no-stdlib.md)
+    * [標準ライブラリーの不使用](no-stdlib.md)
     * [Intrinsics](intrinsics.md)
     * [Lang items](lang-items.md)
     * [一歩進んだリンク](advanced-linking.md)
