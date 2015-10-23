@@ -1,14 +1,12 @@
 % if
 
-Rust’s take on `if` is not particularly complex, but it’s much more like the
-`if` you’ll find in a dynamically typed language than in a more traditional
-systems language. So let’s talk about it, to make sure you grasp the nuances.
+Rustでの`if`は特に複雑ではありません。しかし、それは伝統的なシステム言語の中よりは動的型付け言語の中であなたが見るであろう`if`に似ています。
+それでは、あなたが必ずニュアンスを把握するようにそれについて話しましょう。
 
-`if` is a specific form of a more general concept, the ‘branch’. The name comes
-from a branch in a tree: a decision point, where depending on a choice,
-multiple paths can be taken.
+`if`はより一般的な概念、「ブランチ（branch）」の特殊形式です。
+名前は木の枝に由来します。選択によって複数の道を選ぶことのできる決定点です。
 
-In the case of `if`, there is one choice that leads down two paths:
+`if`の場合、2本の道に通じる1つの選択があります。
 
 ```rust
 let x = 5;
@@ -18,11 +16,11 @@ if x == 5 {
 }
 ```
 
-If we changed the value of `x` to something else, this line would not print.
-More specifically, if the expression after the `if` evaluates to `true`, then
-the block is executed. If it’s `false`, then it is not.
+もし私たちが`x`を他の何かに変えたならば、この行はプリントされなかったでしょう。
+もっと具体的には、もし`if`の後の式が`true`に評価されるならば、そのときはブロックが実行されます。
+もしそれが`false`ならば、そのときは実行されません。
 
-If you want something to happen in the `false` case, use an `else`:
+もしあなたが`false`の場合に何かを起こしたいならば、`else`を使いましょう。
 
 ```rust
 let x = 5;
@@ -34,7 +32,7 @@ if x == 5 {
 }
 ```
 
-If there is more than one case, use an `else if`:
+もし場合分けが1つより多いのであれば、`else if`を使いましょう。
 
 ```rust
 let x = 5;
@@ -48,7 +46,8 @@ if x == 5 {
 }
 ```
 
-This is all pretty standard. However, you can also do this:
+これは全て非常に標準的です。
+しかし、あなたはこうすることもできます。
 
 ```rust
 let x = 5;
@@ -60,7 +59,7 @@ let y = if x == 5 {
 }; // y: i32
 ```
 
-Which we can (and probably should) write like this:
+それを私たちはこのように書くことができます（そしておそらくそうすべきです）。
 
 ```rust
 let x = 5;
@@ -68,6 +67,6 @@ let x = 5;
 let y = if x == 5 { 10 } else { 15 }; // y: i32
 ```
 
-This works because `if` is an expression. The value of the expression is the
-value of the last expression in whichever branch was chosen. An `if` without an
-`else` always results in `()` as the value.
+`if`は式なので、これは動きます。
+式の値は、どのブランチが選ばれてもその中の最後の式の値です。
+`else`のない`if`の結果は常に`()`という値になります。
