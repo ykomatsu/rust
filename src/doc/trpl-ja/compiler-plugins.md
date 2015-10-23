@@ -98,10 +98,9 @@ fn main() {
 * 入力の検査もコンパイル時に行われる
 * それはパターンの中での使用を許すように拡張することができる。パターンは任意のデータ型に対して新しいリテラルの構文を定義する方法を効果的に与える
 
-手続マクロに加えて、あなたは新しい[`derive`]的な属性と他の種類の拡張を定義することができます。
+手続マクロに加えて、あなたは新しい[`derive`](../reference.html#derive)的な属性と他の種類の拡張を定義することができます。
 [`Registry::register_syntax_extension`](../rustc/plugin/registry/struct.Registry.html#method.register_syntax_extension)
-と[`SyntaxExtension`
-enum](https://doc.rust-lang.org/syntax/ext/base/enum.SyntaxExtension.html)を見ましょう。
+と[`SyntaxExtension`列挙型](https://doc.rust-lang.org/syntax/ext/base/enum.SyntaxExtension.html)を見ましょう。
 関連するより多くのマクロの例を知りたければ、[`regex_macros`](https://github.com/rust-lang/regex/blob/master/regex_macros/src/lib.rs)を見ましょう。
 
 ## ヒントと小技
@@ -137,7 +136,7 @@ fn expand_foo(cx: &mut ExtCtxt, sp: Span, args: &[TokenTree])
 # リントプラグイン
 
 プラグインはコードスタイル、安全性などの追加のチェックで[Rustのリントインフラストラクチャー](../reference.html#lint-check-attributes)を拡張することができます。
-あなたは例全体のために[`src/test/auxiliary/lint_plugin_test.rs`](https://github.com/rust-lang/rust/blob/master/src/test/auxiliary/lint_plugin_test.rs)を見ることができます。その核をここに再現します。
+あなたは例全体のために[`src/test/auxiliary/lint_plugin_test.rs`](https://github.com/rust-lang/rust/blob/master/src/test/auxiliary/lint_plugin_test.rs)を見ることができます。その核心をここに再現します。
 
 ```ignore
 declare_lint!(TEST_LINT, Warn,
@@ -189,7 +188,7 @@ foo.rs:4 fn lintme() { }
 リントパスは構文横断ですが、それらは型情報が利用可能になるコンパイルの後ろの段階で実行します。
 `rustc`の[組込みチェック](https://github.com/rust-lang/rust/blob/master/src/librustc/lint/builtin.rs)はほとんど同じインフラストラクチャーをリントプラグインとして使い、型情報へのアクセス方法の例を提供します。
 
-プラグインによって定義されたリントは普通の[属性とコンパイラーフラグ](../reference.html#lint-check-attributes)、例えばに`#[allow(test_lint)]`や`-A test-lint`などによって制御されます。
+プラグインによって定義されたリントは普通の[属性とコンパイラーフラグ](../reference.html#lint-check-attributes)、例えば`#[allow(test_lint)]`や`-A test-lint`などによって制御されます。
 それらの識別子は適切な大文字小文字と句読点の変換の行われた`declare_lint!`の最初の引数に由来します。
 
 あなたは`foo.rs`によって読み込まれたプラグインによって提供されているものを含む、`rustc`が知っているリントの一覧を見るために`rustc -W help foo.rs`を実行できます。
