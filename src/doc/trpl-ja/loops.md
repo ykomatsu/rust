@@ -1,10 +1,14 @@
-% Loops
+% ループ
 
-Rust currently provides three approaches to performing some kind of iterative activity. They are: `loop`, `while` and `for`. Each approach has its own set of uses.
+Rustは現在、いくつかの種類の繰返しを行うために3つのアプローチを提供します。
+それらは、`loop`、`while`、`for`です。
+各アプローチは使い方の独自のセットを持ちます。
 
-## loop
+## ループ
 
-The infinite `loop` is the simplest form of loop available in Rust. Using the keyword `loop`, Rust provides a way to loop indefinitely until some terminating statement is reached. Rust's infinite `loop`s look like this:
+無限`loop`はRustでの最も単純なループの形式です。
+キーワード`loop`を使って、Rustは終了文に到達するまで無限にループする方法を提供します。
+Rustの無限ループはこのように見えます。
 
 ```rust,ignore
 loop {
@@ -14,7 +18,8 @@ loop {
 
 ## while
 
-Rust also has a `while` loop. It looks like this:
+Rustは`while`ループも持ちます。
+それはこのように見えます。
 
 ```rust
 let mut x = 5; // mut x: i32
@@ -31,32 +36,28 @@ while !done {
 }
 ```
 
-`while` loops are the correct choice when you’re not sure how many times
-you need to loop.
+`while`ループはあなたが何回のループを必要とするかが分からないときに正しい選択です。
 
-If you need an infinite loop, you may be tempted to write this:
+もしあなたが無限ループを必要とするのであれば、あなたはこう書きたくなるかもしれません。
 
 ```rust,ignore
 while true {
 ```
 
-However, `loop` is far better suited to handle this case:
+しかし、`loop`の方がこの場合を処理するにはより適しています。
 
 ```rust,ignore
 loop {
 ```
 
-Rust’s control-flow analysis treats this construct differently than a `while
-true`, since we know that it will always loop. In general, the more information
-we can give to the compiler, the better it can do with safety and code
-generation, so you should always prefer `loop` when you plan to loop
-infinitely.
+Rustの制御フロー分析はこの構造を`while true`とは異なる方法で扱います。なぜなら、私たちはそれが常にループするであろうことを知っているからです。
+一般的に、私たちがコンパイラーに多くの情報を与えれば与えるほど、それはより安全性の高い、よりよいコード生成を行うことができます。そのため、あなたが無限にループするつもりであれば、あなたは常に`loop`を選ぶべきです。
 
 ## for
 
-The `for` loop is used to loop a particular number of times. Rust’s `for` loops
-work a bit differently than in other systems languages, however. Rust’s `for`
-loop doesn’t look like this “C-style” `for` loop:
+`for`ループは特定の回数でループするために使われます。
+しかし、Rustの`for`ループは他のシステム言語とは少し違った方法で動きます。
+Rustの`for`ループはこの「Cスタイル」の`for`ループのようには見えません。
 
 ```c
 for (x = 0; x < 10; x++) {
@@ -64,7 +65,7 @@ for (x = 0; x < 10; x++) {
 }
 ```
 
-Instead, it looks like this:
+代わりに、それはこのように見えます。
 
 ```rust
 for x in 0..10 {
@@ -72,7 +73,7 @@ for x in 0..10 {
 }
 ```
 
-In slightly more abstract terms,
+もう少し抽象的な用語ではこうです。
 
 ```ignore
 for var in expression {
@@ -80,27 +81,26 @@ for var in expression {
 }
 ```
 
-The expression is an [iterator][iterator]. The iterator gives back a series of
-elements. Each element is one iteration of the loop. That value is then bound
-to the name `var`, which is valid for the loop body. Once the body is over, the
-next value is fetched from the iterator, and we loop another time. When there
-are no more values, the `for` loop is over.
+expressionは[イテレーター][iterator]です。
+イテレーターは一連の要素を返します。
+各要素はループの繰返しの1回です。
+その値は名前`var`に束縛され、それはループの本文で有効になります。
+一度本文が終了すると、次の値がイテレーターから取得されます。そして、私たちは再びループします。
+値がなくなったとき、`for`ループは終了します。
 
 [iterator]: iterators.html
 
-In our example, `0..10` is an expression that takes a start and an end position,
-and gives an iterator over those values. The upper bound is exclusive, though,
-so our loop will print `0` through `9`, not `10`.
+私たちの例では、`0..10`は最初と最後の位置を受け取り、それらの値に対するイテレーターを与える式です。
+上限は含まれまないので、私たちのループは`0`から`9`までをプリントし、`10`はプリントしないでしょう。
 
-Rust does not have the “C-style” `for` loop on purpose. Manually controlling
-each element of the loop is complicated and error prone, even for experienced C
-developers.
+Rustは「Cスタイル」の`for`ループをあえて持ちません。
+ループの各要素を手動で制御することは、経験豊富なCの開発者にとっても複雑でエラーを起こしがちです。
 
-### Enumerate
+### 列挙
 
-When you need to keep track of how many times you already looped, you can use the `.enumerate()` function.
+あなたが既に何回ループしたかを記録する必要があるとき、あなたは`.enumerate()`関数を使うことができます。
 
-#### On ranges:
+#### レンジの場合
 
 ```rust
 for (i,j) in (5..10).enumerate() {
@@ -108,7 +108,7 @@ for (i,j) in (5..10).enumerate() {
 }
 ```
 
-Outputs:
+出力はこうなります。
 
 ```text
 i = 0 and j = 5
@@ -118,9 +118,9 @@ i = 3 and j = 8
 i = 4 and j = 9
 ```
 
-Don't forget to add the parentheses around the range.
+レンジの周りに丸括弧を追加することを忘れないでください。
 
-#### On iterators:
+#### イテレーターの場合
 
 ```rust
 # let lines = "hello\nworld".lines();
@@ -129,7 +129,7 @@ for (linenumber, line) in lines.enumerate() {
 }
 ```
 
-Outputs:
+出力はこうなります。
 
 ```text
 0: Content of line one
@@ -138,9 +138,9 @@ Outputs:
 3: Content of line four
 ```
 
-## Ending iteration early
+## 繰返しの途中での終了
 
-Let’s take a look at that `while` loop we had earlier:
+私たちが前に見たその`while`ループを見ましょう。
 
 ```rust
 let mut x = 5;
@@ -157,11 +157,10 @@ while !done {
 }
 ```
 
-We had to keep a dedicated `mut` boolean variable binding, `done`, to know
-when we should exit out of the loop. Rust has two keywords to help us with
-modifying iteration: `break` and `continue`.
+いつ私たちがループを抜け出すべきかを知るために、私たちは専用の`mut`のブーリアンの変数束縛を保持しなくてはなりませんでした。
+Rustは繰返しを変更するときに私たちを手助けする2つのキーワード、`break`と`continue`を持ちます。
 
-In this case, we can write the loop in a better way with `break`:
+この場合、私たちはループを`break`を使ってよりよい方法で書くことができます。
 
 ```rust
 let mut x = 5;
@@ -175,10 +174,11 @@ loop {
 }
 ```
 
-We now loop forever with `loop` and use `break` to break out early. Issuing an explicit `return` statement will also serve to terminate the loop early.
+私たちは`loop`で無限にループし、途中で抜け出すために`break`を使います。
+明示的な`return`文を使うこともループを途中で終了することができます。
 
-`continue` is similar, but instead of ending the loop, goes to the next
-iteration. This will only print the odd numbers:
+`continue`も同様ですが、ループを終了する代わりに、次の繰返しに進みます。
+これは奇数だけをプリントするでしょう。
 
 ```rust
 for x in 0..10 {
@@ -188,15 +188,12 @@ for x in 0..10 {
 }
 ```
 
-## Loop labels
+## ループラベル
 
-You may also encounter situations where you have nested loops and need to
-specify which one your `break` or `continue` statement is for. Like most
-other languages, by default a `break` or `continue` will apply to innermost
-loop. In a situation where you would like to a `break` or `continue` for one
-of the outer loops, you can use labels to specify which loop the `break` or
- `continue` statement applies to. This will only print when both `x` and `y` are
- odd:
+あなたはネストしたループを持ち、あなたの`break`文又は`continue`文がどのループに対するものなのかを特定する必要がある状況にも遭遇するかもしれません。
+ほとんどの他の言語のように、デフォルトでは`break`又は`continue`は最も内側のループに適用します。
+あなたが外側のループから`break`又は`continue`したい状況では、あなたはどのループに`break`と`continue`が適用されるのかを特定するためにラベルを使うことができます。
+これは`x`と`y`の両方が奇数であるときだけプリントするでしょう。
 
 ```rust
 'outer: for x in 0..10 {

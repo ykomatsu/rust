@@ -26,7 +26,7 @@
     * [プリミティブ型](primitive-types.md)
     * [コメント](comments.md)
     * [if](if.md)
-    * [Loops](loops.md)
+    * [ループ](loops.md)
     * [Ownership](ownership.md)
     * [References and Borrowing](references-and-borrowing.md)
     * [Lifetimes](lifetimes.md)
