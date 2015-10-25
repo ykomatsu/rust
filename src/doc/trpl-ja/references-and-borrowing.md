@@ -1,48 +1,40 @@
-% References and Borrowing
+% 参照とボローイング
 
-This guide is one of three presenting Rust’s ownership system. This is one of
-Rust’s most unique and compelling features, with which Rust developers should
-become quite acquainted. Ownership is how Rust achieves its largest goal,
-memory safety. There are a few distinct concepts, each with its own
-chapter:
+このガイドはRustの所有権システムの3つの発表の1つです。
+これはRustの最も独特で注目されている機能です。そして、Rust開発者はそれについて高度に精通しておくべきです。
+所有権はどのようにRustがその最大の目標、メモリー安全性を得るのかということです。
+そこにはいくつかの別個の概念があり、各概念が独自の章を持ちます。
 
-* [ownership][ownership], the key concept
-* borrowing, which you’re reading now
-* [lifetimes][lifetimes], an advanced concept of borrowing
+* 鍵となる概念、[所有権][ownership]
+* あなたが今読んでいる、ボローイング
+* ボローイングのもう一歩進んだ概念、[生存期間][lifetimes]
 
-These three chapters are related, and in order. You’ll need all three to fully
-understand the ownership system.
+それらの3つの章は関連していて、それらには順序があります。
+あなたは所有権システムを完全に理解するために、3つ全てを必要とするでしょう。
 
 [ownership]: ownership.html
 [lifetimes]: lifetimes.html
 
-# Meta
+# メタ
 
-Before we get to the details, two important notes about the ownership system.
+私たちが詳細に入る前に、所有権システムについての2つの重要な注意があります。
 
-Rust has a focus on safety and speed. It accomplishes these goals through many
-‘zero-cost abstractions’, which means that in Rust, abstractions cost as little
-as possible in order to make them work. The ownership system is a prime example
-of a zero cost abstraction. All of the analysis we’ll talk about in this guide
-is _done at compile time_. You do not pay any run-time cost for any of these
-features.
+Rustは安全性とスピートに焦点を合わせます。
+Rustはそれらの目標をたくさんの「0コストの抽象化」を通じて成し遂げます。それは、Rustでは抽象化を機能させるためのコストをできる限り小さくすることを意味します。
+所有権システムは0コストの抽象化の主な例です。
+私たちがこのガイドの中で話すであろう解析の全ては _コンパイル時に行われます_ 。
+あなたはそれらのどの機能に対しても実行時のコストを全く支払いません。
 
-However, this system does have a certain cost: learning curve. Many new users
-to Rust experience something we like to call ‘fighting with the borrow
-checker’, where the Rust compiler refuses to compile a program that the author
-thinks is valid. This often happens because the programmer’s mental model of
-how ownership should work doesn’t match the actual rules that Rust implements.
-You probably will experience similar things at first. There is good news,
-however: more experienced Rust developers report that once they work with the
-rules of the ownership system for a period of time, they fight the borrow
-checker less and less.
+しかし、このシステムはあるコストを持ちます。それは学習曲線です。
+多くの新しいRustのユーザーは私たちが「ボローチェッカーとの戦い」と好んで呼ぶものを経験します。そこではRustコンパイラーが開発者が正しいと考えるプログラムをコンパイルすることを拒絶します。
+所有権がどのように機能するのかについてのプログラマーのメンタルモデルがRustの実装する実際のルールにマッチしないため、これはしばしば起きます。
+しかし、よいニュースがあります。より経験豊富なRustの開発者は次のことを報告します。一度彼らが所有権システムのルールとともにしばらく仕事をすれば、彼らがボローチェッカーと戦うことは少なくなっていくということです。
 
-With that in mind, let’s learn about borrowing.
+それを念頭に置いて、ボローイングについて学びましょう。
 
-# Borrowing
+# ボローイング
 
-At the end of the [ownership][ownership] section, we had a nasty function that looked
-like this:
+[所有権][ownership]セクションの最後に、私たちはこのように見える厄介な関数を持ちました。
 
 ```rust
 fn foo(v1: Vec<i32>, v2: Vec<i32>) -> (Vec<i32>, Vec<i32>, i32) {
@@ -58,8 +50,8 @@ let v2 = vec![1, 2, 3];
 let (v1, v2, answer) = foo(v1, v2);
 ```
 
-This is not idiomatic Rust, however, as it doesn’t take advantage of borrowing. Here’s
-the first step:
+しかし、これは慣習的なRustではありません。なぜなら、それはボローイングの利点を使わないからです。
+これが最初のステップです。
 
 ```rust
 fn foo(v1: &Vec<i32>, v2: &Vec<i32>) -> i32 {
@@ -77,15 +69,14 @@ let answer = foo(&v1, &v2);
 // we can use v1 and v2 here!
 ```
 
-Instead of taking `Vec<i32>`s as our arguments, we take a reference:
-`&Vec<i32>`. And instead of passing `v1` and `v2` directly, we pass `&v1` and
-`&v2`. We call the `&T` type a ‘reference’, and rather than owning the resource,
-it borrows ownership. A binding that borrows something does not deallocate the
-resource when it goes out of scope. This means that after the call to `foo()`,
-we can use our original bindings again.
+私たちの引数として`Vec<i32>`を使う代わりに、私たちは参照、つまり`&vec<i32>`を使います。
+そして、`v1`と`v2`を直接渡す代わりに、私たちは`&v1`と`&v2`を渡します。
+私たちは`&T`型を「参照」と呼びます。それは、リソースを所有するのではなく、所有権をボローします。
+何かをボローした束縛はそれがスコープから外れるときにリソースを割当解除しません。
+これは`foo()`の呼出しの後に私たちは私たちの元の束縛を再び使うことができることを意味します。
 
-References are immutable, just like bindings. This means that inside of `foo()`,
-the vectors can’t be changed at all:
+参照は束縛とちょうど同じようにイミュータブルです。
+これは`foo()`の中ではベクターは全く変更できないことを意味します。
 
 ```rust,ignore
 fn foo(v: &Vec<i32>) {
@@ -97,7 +88,7 @@ let v = vec![];
 foo(&v);
 ```
 
-errors with:
+このエラーが出ます。
 
 ```text
 error: cannot borrow immutable borrowed content `*v` as mutable
@@ -105,12 +96,13 @@ v.push(5);
 ^
 ```
 
-Pushing a value mutates the vector, and so we aren’t allowed to do it.
+値の挿入はベクターを変更し、そして私たちはそうすることを許されていません。
 
-# &mut references
+# &mut参照
 
-There’s a second kind of reference: `&mut T`. A ‘mutable reference’ allows you
-to mutate the resource you’re borrowing. For example:
+参照には2種類目、`&mut T`があります。
+「ミュータブルな参照」はあなたにあなたがボローしているリソースの変更を許します。
+例はこうなります。
 
 ```rust
 let mut x = 5;
@@ -121,18 +113,17 @@ let mut x = 5;
 println!("{}", x);
 ```
 
-This will print `6`. We make `y` a mutable reference to `x`, then add one to
-the thing `y` points at. You’ll notice that `x` had to be marked `mut` as well,
-if it wasn’t, we couldn’t take a mutable borrow to an immutable value.
+これは`6`をプリントするでしょう。
+私たちは`y`を`x`へのミュータブルな参照にして、それから`y`の指示先に1を足します。
+あなたは`x`も`mut`とマークしなければならないことに気付くでしょう。もしそれをそうしなかったならば、私たちはイミュータブルな値へのミュータブルなボローを使うことはできません。
 
-You'll also notice we added an asterisk (`*`) in front of `y`, making it `*y`,
-this is because `y` is an `&mut` reference. You'll also need to use them for
-accessing the contents of a reference as well.
+あなたは私たちがアスタリスク（`*`）を`y`の前に追加して、それを`*y`にしたことにも気付くでしょう。これは、`y`が`&mut`参照だからです。
+あなたは参照の内容にアクセスするためにもそれらを使う必要があるでしょう。
 
-Otherwise, `&mut` references are just like references. There _is_ a large
-difference between the two, and how they interact, though. You can tell
-something is fishy in the above example, because we need that extra scope, with
-the `{` and `}`. If we remove them, we get an error:
+そうしなければ、`&mut`参照はただの参照です。
+しかし、2つの間には、そしてそれらがどのように反応するかには大きな違いがあります。
+あなたは前の例で何かが怪しいと言うことができます。なぜなら、私たちは`{`と`}`を使って追加のスコープを必要とするからです。
+もし私たちがそれらを削除すれば、エラーが出ます。
 
 ```text
 error: cannot borrow `x` as immutable because it is also borrowed as mutable
@@ -149,37 +140,31 @@ fn main() {
 ^
 ```
 
-As it turns out, there are rules.
+結論から言うと、そこにはルールがあります。
 
-# The Rules
+# ルール
 
-Here’s the rules about borrowing in Rust:
+これがRustでのボローイングについてのルールです。
 
-First, any borrow must last for a scope no greater than that of the owner.
-Second, you may have one or the other of these two kinds of borrows, but not
-both at the same time:
+最初に、ボローは全て所有者のスコープより長く存続してはなりません。
+次に、あなたは次の2種類のボローのどちらか1つを持つかもしれませんが、両方を同時に持つことはありません。
 
-* one or more references (`&T`) to a resource,
-* exactly one mutable reference (`&mut T`).
+* リソースに対する1つ以上の参照（`&T`）
+* ただ1つのミュータブルな参照（`&mut T`）
 
+あなたはこれがデータ競合の定義と非常に似ていることに気付くかもしれません。全く同じではありませんが。
 
-You may notice that this is very similar, though not exactly the same as,
-to the definition of a data race:
+> 「データ競合」は2つ以上のポインターがメモリーの同じ場所に同時にアクセスするとき、少なくともそれらの1つが書込みを行っていて、作業が同期されていないところで「データ競合」は起きます。
 
-> There is a ‘data race’ when two or more pointers access the same memory
-> location at the same time, where at least one of them is writing, and the
-> operations are not synchronized.
+参照を使うとき、あなたは好きなだけ参照を持つかもしれません。しかし、それらのどれも書込みは行いません。
+もしあなたが書込みを行うのであれば、あなたは同じメモリーへの2つ以上のポインターを必要とし、同時に1つだけ`&mut`を持つことができます。
+これがどのようにRustがデータ競合をコンパイル時に回避するのかということです。もし私たちがルールを破れば、そのときはエラーが出るでしょう。
 
-With references, you may have as many as you’d like, since none of them are
-writing. If you are writing, you need two or more pointers to the same memory,
-and you can only have one `&mut` at a time. This is how Rust prevents data
-races at compile time: we’ll get errors if we break the rules.
+これを念頭に置いて、もう一度私たちの例を考えましょう。
 
-With this in mind, let’s consider our example again.
+## スコープの考え方
 
-## Thinking in scopes
-
-Here’s the code:
+これがコードです。
 
 ```rust,ignore
 let mut x = 5;
@@ -190,7 +175,7 @@ let y = &mut x;
 println!("{}", x);
 ```
 
-This code gives us this error:
+このコードはこのエラーを出します。
 
 ```text
 error: cannot borrow `x` as immutable because it is also borrowed as mutable
@@ -198,9 +183,9 @@ error: cannot borrow `x` as immutable because it is also borrowed as mutable
                    ^
 ```
 
-This is because we’ve violated the rules: we have a `&mut T` pointing to `x`,
-and so we aren’t allowed to create any `&T`s. One or the other. The note
-hints at how to think about this problem:
+これは私たちがルールに違反しているからです。つまり、私たちは`x`を指示する`&mut T`を持つので、`&T`を作ることは許されていないということです。
+どちらか1つです。
+メモはこの問題についての考え方のヒントを示します。
 
 ```text
 note: previous borrow ends here
@@ -210,11 +195,11 @@ fn main() {
 ^
 ```
 
-In other words, the mutable borrow is held through the rest of our example. What
-we want is for the mutable borrow to end _before_ we try to call `println!` and
-make an immutable borrow. In Rust, borrowing is tied to the scope that the
-borrow is valid for. And our scopes look like this:
-
+言い換えれば、ミュータブルなボローは私たちの例の残りの間ずっと保持されます。
+私たちが欲しいものは、私たちが`println!`を呼び出し、イミュータブルなボローを作ろうとする _前に_ 終わるミュータブルなボローです。
+Rustではボローイングはボローが有効なスコープと結び付けられます。
+そして私たちのスコープはこのように見えます。
+s
 ```rust,ignore
 let mut x = 5;
 
@@ -226,9 +211,9 @@ println!("{}", x); // -+ - try to borrow x here
                    // -+ &mut borrow of x ends here
 ```
 
-The scopes conflict: we can’t make an `&x` while `y` is in scope.
+スコープは衝突します。`y`がスコープにあるとき、私たちは`&x`を作ることができません。
 
-So when we add the curly braces:
+そして、私たちが波括弧を追加するときはこうなります。
 
 ```rust
 let mut x = 5;
@@ -241,19 +226,21 @@ let mut x = 5;
 println!("{}", x);  // <- try to borrow x here
 ```
 
-There’s no problem. Our mutable borrow goes out of scope before we create an
-immutable one. But scope is the key to seeing how long a borrow lasts for.
+問題ありません。
+私たちのミュータブルなボローは私たちがイミュータブルなボローを作る前にスコープから外れます。
+しかしスコープはボローがどれくらい存続するのかを考えるための鍵です。
 
-## Issues borrowing prevents
+## ボローイングが回避する問題
 
-Why have these restrictive rules? Well, as we noted, these rules prevent data
-races. What kinds of issues do data races cause? Here’s a few.
+なぜこのような厳格なルールを持つのでしょうか。
+ええ、私たちが言及したように、それらのルールはデータ競合を回避します。
+データ競合はどのような種類の問題を起こすのでしょうか。
+これが一部です。
 
-### Iterator invalidation
+### イテレーターの不正
 
-One example is ‘iterator invalidation’, which happens when you try to mutate a
-collection that you’re iterating over. Rust’s borrow checker prevents this from
-happening:
+一例は「イテレーターの不正」です。それはあなたがあなたが繰返しを行っているコレクションを変更しようとするときに起こります。
+Rustのボローチェッカーはこれの発生を回避します。
 
 ```rust
 let mut v = vec![1, 2, 3];
@@ -263,9 +250,9 @@ for i in &v {
 }
 ```
 
-This prints out one through three. As we iterate through the vectors, we’re
-only given references to the elements. And `v` is itself borrowed as immutable,
-which means we can’t change it while we’re iterating:
+これは1から3までをプリントアウトします。
+私たちはベクターを繰り返すので、私たちは要素への参照だけ与えられます。
+そして、`v`はそれ自体イミュータブルとしてボローされ、それは私たちが繰返しを行っているときはそれを変更できないことを意味します。
 
 ```rust,ignore
 let mut v = vec![1, 2, 3];
@@ -276,7 +263,7 @@ for i in &v {
 }
 ```
 
-Here’s the error:
+これがエラーです。
 
 ```text
 error: cannot borrow `v` as mutable because it is also borrowed as immutable
@@ -294,15 +281,15 @@ for i in &v {
 ^
 ```
 
-We can’t modify `v` because it’s borrowed by the loop.
+`v`はループによってボローされるので、私たちはそれを変更できません。
 
-### use after free
+### 解放後の使用
 
-References must not live longer than the resource they refer to. Rust will
-check the scopes of your references to ensure that this is true.
+参照はそれらの指示するリソースよりも長く生存することはできません。
+Rustはこれが真であることを保証するために、あなたの参照のスコープをチェックするでしょう。
 
-If Rust didn’t check this property, we could accidentally use a reference
-which was invalid. For example:
+もしRustがこの所有物をチェックしなければ、私たちは不正な参照をうっかり使ってしまうことがあります。
+例えばこうです。
 
 ```rust,ignore
 let y: &i32;
@@ -314,7 +301,7 @@ let y: &i32;
 println!("{}", y);
 ```
 
-We get this error:
+このエラーが出ます。
 
 ```text
 error: `x` does not live long enough
@@ -335,14 +322,12 @@ statement 0 at 4:18
 }
 ```
 
-In other words, `y` is only valid for the scope where `x` exists. As soon as
-`x` goes away, it becomes invalid to refer to it. As such, the error says that
-the borrow ‘doesn’t live long enough’ because it’s not valid for the right
-amount of time.
+言い換えれば、`y`は`x`が存在するスコープの中でだけ有効です。
+`x`がなくなるとすぐに、それを指示することは不正になります。
+そのように、エラーはボローが「十分長く生存していない」ことを示します。なぜなら、それが正しい期間正しくないからです。
 
-The same problem occurs when the reference is declared _before_ the variable it
-refers to. This is because resources within the same scope are freed in the
-opposite order they were declared:
+参照がそれの参照する変数より前に宣言されたとき、同じ問題が起こります。
+これは同じスコープにあるリソースはそれらの宣言された順番と逆に解放されるからです。
 
 ```rust,ignore
 let y: &i32;
@@ -352,7 +337,7 @@ y = &x;
 println!("{}", y);
 ```
 
-We get this error:
+このエラーが出ます。
 
 ```text
 error: `x` does not live long enough
@@ -376,5 +361,4 @@ statement 1 at 3:14
 }
 ```
 
-In the above example, `y` is declared before `x`, meaning that `y` lives longer
-than `x`, which is not allowed.
+前の例では、`y`は`x`より前に宣言されています。それは、`y`が`x`より長く生存することを意味し、それは許されません。

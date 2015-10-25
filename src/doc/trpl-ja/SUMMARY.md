@@ -28,7 +28,7 @@
     * [if](if.md)
     * [ループ](loops.md)
     * [所有権](ownership.md)
-    * [References and Borrowing](references-and-borrowing.md)
+    * [参照とボローイング](references-and-borrowing.md)
     * [Lifetimes](lifetimes.md)
     * [Mutability](mutability.md)
     * [Structs](structs.md)
