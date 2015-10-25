@@ -27,7 +27,7 @@
     * [コメント](comments.md)
     * [if](if.md)
     * [ループ](loops.md)
-    * [Ownership](ownership.md)
+    * [所有権](ownership.md)
     * [References and Borrowing](references-and-borrowing.md)
     * [Lifetimes](lifetimes.md)
     * [Mutability](mutability.md)
