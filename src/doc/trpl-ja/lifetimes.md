@@ -103,7 +103,7 @@ fn bar<'a, 'b>(...)
 
 # `struct`の中
 
-[`struct`][struct]を使うとき、あなたは明示的な生存期間も必要とするでしょう。
+[`struct`][structs]を使うとき、あなたは明示的な生存期間も必要とするでしょう。
 
 ```rust
 struct Foo<'a> {
