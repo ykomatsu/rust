@@ -29,7 +29,7 @@
     * [ループ](loops.md)
     * [所有権](ownership.md)
     * [参照とボローイング](references-and-borrowing.md)
-    * [Lifetimes](lifetimes.md)
+    * [生存期間](lifetimes.md)
     * [Mutability](mutability.md)
     * [Structs](structs.md)
     * [Enums](enums.md)
