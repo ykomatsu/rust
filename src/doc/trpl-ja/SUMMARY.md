@@ -30,7 +30,7 @@
     * [所有権](ownership.md)
     * [参照とボローイング](references-and-borrowing.md)
     * [生存期間](lifetimes.md)
-    * [Mutability](mutability.md)
+    * [ミュータビリティー](mutability.md)
     * [Structs](structs.md)
     * [Enums](enums.md)
     * [Match](match.md)
