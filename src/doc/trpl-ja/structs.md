@@ -1,15 +1,14 @@
-% Structs
+% 構造体
 
-`struct`s are a way of creating more complex data types. For example, if we were
-doing calculations involving coordinates in 2D space, we would need both an `x`
-and a `y` value:
+`struct`は複雑なデータ型を作るための方法です。
+例えば、もし私たちが2D空間内の座標に関わる計算を行っていたならば、私たちは`x`の値と`y`の値の両方を必要としたでしょう。
 
 ```rust
 let origin_x = 0;
 let origin_y = 0;
 ```
 
-A `struct` lets us combine these two into a single, unified datatype:
+`struct`によって私たちはそれらの2つを1つの統合されたデータ型に結合することが可能になります。
 
 ```rust
 struct Point {
@@ -24,19 +23,17 @@ fn main() {
 }
 ```
 
-There’s a lot going on here, so let’s break it down. We declare a `struct` with
-the `struct` keyword, and then with a name. By convention, `struct`s begin with
-a capital letter and are camel cased: `PointInSpace`, not `Point_In_Space`.
+ここでは多くのことが行われているので、それを分解しましょう。
+私たちは`struct`を`struct`キーワードと名前で宣言します。
+慣習によって、`struct`は大文字で始まりキャメルケースです。つまり、`Point_In_Space`ではなく`PointInSpace`です。
 
-We can create an instance of our `struct` via `let`, as usual, but we use a `key:
-value` style syntax to set each field. The order doesn’t need to be the same as
-in the original declaration.
+いつものとおり、私たちは私たちの`struct`のインスタンスを`let`を通じて作ることができます。しかし、私たちは`key: value`スタイルの構文を各フィールドをセットするために使います。
+順番は元の宣言内と同じである必要はありません。
 
-Finally, because fields have names, we can access the field through dot
-notation: `origin.x`.
+最後に、フィールドは名前を持つので、私たちはフィールドにドット記法を通じてアクセスすることができます。つまり、`origin.x`のようにです。
 
-The values in `struct`s are immutable by default, like other bindings in Rust.
-Use `mut` to make them mutable:
+`struct`内の値はRustでの他の束縛と同じようにデフォルトでイミュータブルです。
+それらをミュータブルにするためには`mut`を使いましょう。
 
 ```rust
 struct Point {
@@ -53,10 +50,9 @@ fn main() {
 }
 ```
 
-This will print `The point is at (5, 0)`.
+これは`The point is at (5, 0)`をプリントするでしょう。
 
-Rust does not support field mutability at the language level, so you cannot
-write something like this:
+Rustはフィールドレベルのミュータビリティーを言語レベルではサポートしません。そのため、あなたはこのようなものを書くことができません。
 
 ```rust,ignore
 struct Point {
@@ -65,11 +61,9 @@ struct Point {
 }
 ```
 
-Mutability is a property of the binding, not of the structure itself. If you’re
-used to field-level mutability, this may seem strange at first, but it
-significantly simplifies things. It even lets you make things mutable for a short
-time only:
-
+ミュータビリティーは束縛の特性で、構造体自体の特性ではありません。
+もしあなたがフィールドレベルのミュータビリティーを使っていたのであれば、これは最初は変に見えるかもしれません。しかし、それはかなり物事を単純にします。
+それによってあなたは何かを短い時間だけミュータブルにすることさえ可能になります。
 
 ```rust,ignore
 struct Point {
@@ -88,10 +82,10 @@ fn main() {
 }
 ```
 
-# Update syntax
+# 更新構文
 
-A `struct` can include `..` to indicate that you want to use a copy of some
-other `struct` for some of the values. For example:
+`struct`はあなたがいくつかの値のために他の`struct`のコピーが欲しいことを示すために`..`を含むことができます。
+例えばこうです。
 
 ```rust
 struct Point3d {
@@ -104,9 +98,8 @@ let mut point = Point3d { x: 0, y: 0, z: 0 };
 point = Point3d { y: 1, .. point };
 ```
 
-This gives `point` a new `y`, but keeps the old `x` and `z` values. It doesn’t
-have to be the same `struct` either, you can use this syntax when making new
-ones, and it will copy the values you don’t specify:
+これは`point`に新しい`y`を与えますが、古い`x`の値と`z`の値を保持します。
+それは同じ`struct`である必要はありません。あなたは新しい構造体を作るときにこの構文を使うことができ、それはあなたの明示しない値をコピーするでしょう。
 
 ```rust
 # struct Point3d {
@@ -118,11 +111,10 @@ let origin = Point3d { x: 0, y: 0, z: 0 };
 let point = Point3d { z: 1, x: 2, .. origin };
 ```
 
-# Tuple structs
+# タプル構造体
 
-Rust has another data type that’s like a hybrid between a [tuple][tuple] and a
-`struct`, called a ‘tuple struct’. Tuple structs have a name, but
-their fields don’t:
+Rustはもう1つのデータ型を持ちます。それは[タプル][tuple]と`struct`の間のハイブリッドのようなもので、「タプル構造体」と呼ばれます。
+タプル構造体は名前を持ちますが、それらのフィールドは持ちません。
 
 ```rust
 struct Color(i32, i32, i32);
@@ -131,7 +123,7 @@ struct Point(i32, i32, i32);
 
 [tuple]: primitive-types.html#tuples
 
-These two will not be equal, even if they have the same values:
+それら2つは等しくはないでしょう。それらが同じ値を持っているとしても。
 
 ```rust
 # struct Color(i32, i32, i32);
@@ -140,8 +132,8 @@ let black = Color(0, 0, 0);
 let origin = Point(0, 0, 0);
 ```
 
-It is almost always better to use a `struct` than a tuple struct. We would write
-`Color` and `Point` like this instead:
+`struct`を使うことはタプル構造体を使うことよりもほとんど常によいです。
+私たちは`Color`と`Point`を代わりにこのように書くでしょう。
 
 ```rust
 struct Color {
@@ -157,13 +149,11 @@ struct Point {
 }
 ```
 
-Now, we have actual names, rather than positions. Good names are important,
-and with a `struct`, we have actual names.
+今度は、私たちは位置ではなく実際の名前を持ちます。
+よい名前は重要です。そして`struct`では私たちは実際の名前を持ちます。
 
-There _is_ one case when a tuple struct is very useful, though, and that’s a
-tuple struct with only one element. We call this the ‘newtype’ pattern, because
-it allows you to create a new type, distinct from that of its contained value
-and expressing its own semantic meaning:
+しかし、タプル構造体が非常に便利な場合が1つ *だけ* あります。それは、1つだけ要素を持つタプル構造体です。
+私たちはこれを「ニュータイプ」パターンと呼びます。なぜなら、それによってあなたは新しい型を作ることが可能になるからです。それはそれの含む値とは別個の型であり、それ独自のセマンティックな意味を表現します。
 
 ```rust
 struct Inches(i32);
@@ -174,13 +164,12 @@ let Inches(integer_length) = length;
 println!("length is {} inches", integer_length);
 ```
 
-As you can see here, you can extract the inner integer type through a
-destructuring `let`, just as with regular tuples. In this case, the
-`let Inches(integer_length)` assigns `10` to `integer_length`.
+ここであなたが見たとおり、ちょうど通常のタプルのように、あなたは分配束縛`let`を通じて内側の整数型を展開することができます。
+この場合、`let Inches(integer_length)`は`10`を`integer_length`に割り当てます。
 
-# Unit-like structs
+# ユニット的構造体
 
-You can define a `struct` with no members at all:
+あなたは全くメンバーを持たない`struct`を定義することができます。
 
 ```rust
 struct Electron;
@@ -188,15 +177,11 @@ struct Electron;
 let x = Electron;
 ```
 
-Such a `struct` is called ‘unit-like’ because it resembles the empty
-tuple, `()`, sometimes called ‘unit’. Like a tuple struct, it defines a
-new type.
+そのような`struct`は「ユニット的」と呼ばれます。なぜなら、ときどき「ユニット」と呼ばれる空タプル`()`にそれが似ているからです。
+タプル構造体のように、それは新しい型を定義します。
 
-This is rarely useful on its own (although sometimes it can serve as a
-marker type), but in combination with other features, it can become
-useful. For instance, a library may ask you to create a structure that
-implements a certain [trait][trait] to handle events. If you don’t have
-any data you need to store in the structure, you can just create a
-unit-like `struct`.
+これがそれ自体で便利なことはめったにありません（ときどきそれはマーカー型として役に立ちますが）。しかし、他の機能と組み合わせることによって、それは便利になることがあります。
+例えば、ライブラリーはあなたにイベント処理のためにある[トレイト][trait]を実装する構造体を作ることを求めるかもしれません。
+もしあなたが構造体に保存する必要のあるデータを全く持たないのであれば、あなたは単純にユニット的`struct`を作ることができます。
 
 [trait]: traits.html

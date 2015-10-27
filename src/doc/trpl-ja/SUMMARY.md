@@ -31,7 +31,7 @@
     * [参照とボローイング](references-and-borrowing.md)
     * [生存期間](lifetimes.md)
     * [ミュータビリティー](mutability.md)
-    * [Structs](structs.md)
+    * [構造体](structs.md)
     * [Enums](enums.md)
     * [Match](match.md)
     * [Patterns](patterns.md)
