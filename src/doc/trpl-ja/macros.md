@@ -1,37 +1,30 @@
-% Macros
+% マクロ
 
-By now you’ve learned about many of the tools Rust provides for abstracting and
-reusing code. These units of code reuse have a rich semantic structure. For
-example, functions have a type signature, type parameters have trait bounds,
-and overloaded functions must belong to a particular trait.
+もう私たちはRustが抽象化とコードの再利用のために提供するツールの多くについて学びました。
+それらのコードの再利用の単位はリッチでセマンティックな構造を持ちます。
+例えば、関数は型シグネチャーを持ち、型パラメーターはトレイトの束縛を持ち、オーバーロードされる関数は特定のトレイトに属さなければなりません。
 
-This structure means that Rust’s core abstractions have powerful compile-time
-correctness checking. But this comes at the price of reduced flexibility. If
-you visually identify a pattern of repeated code, you may find it’s difficult
-or cumbersome to express that pattern as a generic function, a trait, or
-anything else within Rust’s semantics.
+この構造はRustのコアとなる抽象化が強力なコンパイル時の正当性チェック機能を持つことを意味します。
+しかし、これは柔軟性の低下というかなりの犠牲を払います。
+もしあなたが繰り返されるコードのパターンを視覚的に識別するならば、あなたはそのパターンをジェネリック関数、トレイト、Rustのセマンティクス内の他の何かとして表現することの難しさ又は厄介さに気付くかもしれません。
 
-Macros allow us to abstract at a syntactic level. A macro invocation is
-shorthand for an "expanded" syntactic form. This expansion happens early in
-compilation, before any static checking. As a result, macros can capture many
-patterns of code reuse that Rust’s core abstractions cannot.
+マクロによって私たちは構文レベルの抽象化が可能になります。
+マクロの実行は「展開される」構文形式の省略表現です。
+この展開はコンパイルの初期、全ての静的チェックの前に起こります。
+結果として、マクロはRustのコアとなる抽象化ではできないコードの再利用の多くのパターンを捉えることができます。
 
-The drawback is that macro-based code can be harder to understand, because
-fewer of the built-in rules apply. Like an ordinary function, a well-behaved
-macro can be used without understanding its implementation. However, it can be
-difficult to design a well-behaved macro!  Additionally, compiler errors in
-macro code are harder to interpret, because they describe problems in the
-expanded code, not the source-level form that developers use.
+欠点は、マクロベースのコードは理解しにくくなることがあるということです。なぜなら、組込みのルールが適用されることが少ないからです。
+普通の関数のようによい振舞いのマクロはその実装の理解なしで使うことができます。
+しかし、よい振舞いのマクロを設計することは難しいことがあります！　
+加えて、マクロのコードでのコンパイラーのエラーは解釈することが難しいです。なぜなら、それらは開発者の使うソースレベル形式ではなく、展開されたコードでの問題を説明するからです。
 
-These drawbacks make macros something of a "feature of last resort". That’s not
-to say that macros are bad; they are part of Rust because sometimes they’re
-needed for truly concise, well-abstracted code. Just keep this tradeoff in
-mind.
+それらの欠点はマクロを少し「伝家の宝刀的機能」にします。
+それはマクロが悪であるということを表しません。それらはRustの一部です。なぜなら、ときどきそれらは本当に簡潔でよく抽象化されたコードのために必要になることがあるからです。
+このトレードオフをしっかり念頭に置きましょう。
 
-# Defining a macro
+# マクロの定義
 
-You may have seen the `vec!` macro, used to initialize a [vector][vector] with
-any number of elements.
+あなたは`vec!`マクロを見たことがあるかもしれません。それは任意の数の要素を持つ[ベクター][vector]の初期化に使われます。
 
 [vector]: vectors.html
 
@@ -40,8 +33,8 @@ let x: Vec<u32> = vec![1, 2, 3];
 # assert_eq!(x, [1, 2, 3]);
 ```
 
-This can’t be an ordinary function, because it takes any number of arguments.
-But we can imagine it as syntactic shorthand for
+これを普通の関数にすることはできません。なぜなら、それは任意の個数の引数を受け取るからです。
+しかし、私たちはそれを構文上の省略表現として想像することができます。
 
 ```rust
 let x: Vec<u32> = {
@@ -54,10 +47,9 @@ let x: Vec<u32> = {
 # assert_eq!(x, [1, 2, 3]);
 ```
 
-We can implement this shorthand, using a macro: [^actual]
+私たちはこの省略表現をマクロを使って実装することができます。[^actual]
 
-[^actual]: The actual definition of `vec!` in libcollections differs from the
-           one presented here, for reasons of efficiency and reusability.
+[^actual]: libcollectionsでの`vec!`の実際の定義は、効率と再利用性の理由からここで提示したものとは異なります。
 
 ```rust
 macro_rules! vec {
@@ -76,41 +68,39 @@ macro_rules! vec {
 # }
 ```
 
-Whoa, that’s a lot of new syntax! Let’s break it down.
+うわー、何てたくさんの新しい構文でしょう！　
+それを分解しましょう。
 
 ```ignore
 macro_rules! vec { ... }
 ```
 
-This says we’re defining a macro named `vec`, much as `fn vec` would define a
-function named `vec`. In prose, we informally write a macro’s name with an
-exclamation point, e.g. `vec!`. The exclamation point is part of the invocation
-syntax and serves to distinguish a macro from an ordinary function.
+これは私たちが`vec`と名付けられたマクロを定義していることを表します。それは`fn vec`が`vec`と名付けられた関数を定義しようとすることと同様です。
+散文では私たちは非公式にマクロ名にエクスクラメーションポイントを付けて書きます。例えば、`vec!`のようにです。
+エクスクラメーションポイントは実行構文の一部で、マクロを普通の関数から区別するために役立ちます。
 
-## Matching
+## マッチング
 
-The macro is defined through a series of rules, which are pattern-matching
-cases. Above, we had
+マクロは一連のルールを通じて定義されます。それらは場合分けのパターンマッチングです。
+上で私たちは次のものを見ました。
 
 ```ignore
 ( $( $x:expr ),* ) => { ... };
 ```
 
-This is like a `match` expression arm, but the matching happens on Rust syntax
-trees, at compile time. The semicolon is optional on the last (here, only)
-case. The "pattern" on the left-hand side of `=>` is known as a ‘matcher’.
-These have [their own little grammar] within the language.
+これは`match`式の肢に似ていますが、マッチングはRustの構文木でコンパイル時に起きます。
+最後の（ここでは唯一の）場合分けのセミコロンはオプションです。
+「パターン」の`=>`の左辺は「マッチャー」として知られています。
+それらは言語内に[それら独自の小さな文法][their own little grammar]を持ちます。
 
 [their own little grammar]: ../reference.html#macros
 
-The matcher `$x:expr` will match any Rust expression, binding that syntax tree
-to the ‘metavariable’ `$x`. The identifier `expr` is a ‘fragment specifier’;
-the full possibilities are enumerated later in this chapter.
-Surrounding the matcher with `$(...),*` will match zero or more expressions,
-separated by commas.
+マッチャー`$x:expr`は任意のRustの式にマッチし、その構文木を「メタ変数」`$x`に束縛するでしょう。
+識別子`expr`は「フラグメント指定子」で、使用可能な全てはこの章の後の方に列挙されます。
+マッチャーを`$(...),*`で囲んだものはコンマで区切られた0個以上の式にマッチするでしょう。
 
-Aside from the special matcher syntax, any Rust tokens that appear in a matcher
-must match exactly. For example,
+特別なマッチャー構文を別にして、マッチャーに現れる全てのRustのトークンはぴったりマッチしなければなりません。
+例えばこうです。
 
 ```rust
 macro_rules! foo {
@@ -123,29 +113,29 @@ fn main() {
 }
 ```
 
-will print
+これは次のものをプリントするでしょう。
 
 ```text
 mode Y: 3
 ```
 
-With
+これだとどうでしょうか。
 
 ```rust,ignore
 foo!(z => 3);
 ```
 
-we get the compiler error
+私たちはコンパイラーからエラーを受け取ります。
 
 ```text
 error: no rules expected the token `z`
 ```
 
-## Expansion
+## 展開
 
-The right-hand side of a macro rule is ordinary Rust syntax, for the most part.
-But we can splice in bits of syntax captured by the matcher. From the original
-example:
+マクロルールの右辺はほとんどの部分が普通のRustの構文です。
+しかし、私たちはマッチャーが捉えたばらばらの構文を継ぎ合せることができます。
+元の例から引用します。
 
 ```ignore
 $(
@@ -153,17 +143,15 @@ $(
 )*
 ```
 
-Each matched expression `$x` will produce a single `push` statement in the
-macro expansion. The repetition in the expansion proceeds in "lockstep" with
-repetition in the matcher (more on this in a moment).
+マッチした式`x`はそれぞれマクロ展開時に1つの`push`文を生成するでしょう。
+展開の繰返しはマッチャーの繰返しと「ロックステップ」で進行します（これについてはじきに詳しく説明します）。
 
-Because `$x` was already declared as matching an expression, we don’t repeat
-`:expr` on the right-hand side. Also, we don’t include a separating comma as
-part of the repetition operator. Instead, we have a terminating semicolon
-within the repeated block.
+式のマッチングのときに`$x`は既に宣言されているので、私たちは`:expr`を右辺で繰り返しません。
+同様に私たちは区切りのコンマを繰返しオペレーターの一部として含めません。
+代わりに、私たちは繰返しブロックの中では末尾のセミコロンを持ちます。
 
-Another detail: the `vec!` macro has *two* pairs of braces on the right-hand
-side. They are often combined like so:
+もう1つの詳細はこうです。`vec!`マクロは *2つの* 組の波括弧を右辺に持ちます。
+それらはしばしばこのように組み合わせられます。
 
 ```ignore
 macro_rules! foo {
@@ -173,30 +161,29 @@ macro_rules! foo {
 }
 ```
 
-The outer braces are part of the syntax of `macro_rules!`. In fact, you can use
-`()` or `[]` instead. They simply delimit the right-hand side as a whole.
+外側の波括弧は`macro_rules!`構文の一部です。
+実際、あなたは`()`や`[]`を代わりに使うことができます。
+それらは単に全体としての右辺の範囲を定めるだけです。
 
-The inner braces are part of the expanded syntax. Remember, the `vec!` macro is
-used in an expression context. To write an expression with multiple statements,
-including `let`-bindings, we use a block. If your macro expands to a single
-expression, you don’t need this extra layer of braces.
+内側の波括弧は展開される構文の一部です。
+`vec!`マクロは式の文脈で使われるということを思い出しましょう。
+`let`束縛を含めた複数の文で式を書くために、私たちはブロックを使います。
+もしあなたのマクロが1つの式に展開されるならば、あなたはこの余分な波括弧の層を必要としません。
 
-Note that we never *declared* that the macro produces an expression. In fact,
-this is not determined until we use the macro as an expression. With care, you
-can write a macro whose expansion works in several contexts. For example,
-shorthand for a data type could be valid as either an expression or a pattern.
+私たちはマクロが式を生成するとは決して *言い切らなかった* ということに注意しましょう。
+実際、私たちがマクロを式として使うまで、これは決定されません。
+注意すれば、あなたは展開がいくつかの文脈で動作するマクロを書くことができます。
+例えば、データ型の省略表現は式又はパターンのどちらでも有効なことがあります。
 
-## Repetition
+## 繰返し
 
-The repetition operator follows two principal rules:
+繰返しオペレーターは2つの主ななルールに従います。
 
-1. `$(...)*` walks through one "layer" of repetitions, for all of the `$name`s
-   it contains, in lockstep, and
-2. each `$name` must be under at least as many `$(...)*`s as it was matched
-   against. If it is under more, it’ll be duplicated, as appropriate.
+1. `$(...)*`は繰返しの1つの「層」をそれの含む全ての`$name`のためにロックステップで巡回する
+2. そして各`$name`は`$(...)*`と同じ数だけマッチしたそれに属さなければならない。
+   もしそれが2個以上であれば、それは適切に複製されるであろう
 
-This baroque macro illustrates the duplication of variables from outer
-repetition levels.
+この凝ったマクロは外側の繰返しレベルでの変数の複製を例示します。
 
 ```rust
 macro_rules! o_O {
@@ -218,20 +205,17 @@ fn main() {
 }
 ```
 
-That’s most of the matcher syntax. These examples use `$(...)*`, which is a
-"zero or more" match. Alternatively you can write `$(...)+` for a "one or
-more" match. Both forms optionally include a separator, which can be any token
-except `+` or `*`.
+それがマッチャー構文のほとんどです。
+それらの例は`$(...)*`を使い、それは「0個以上」のマッチです。
+代わりにあなたは「1個以上」のマッチのために`$(...)+`と書くことができます。
+どちらの形式もオプションとしてセパレーターを含み、それは`+`と`*`以外の任意のトークンにすることができます。
 
-This system is based on
-"[Macro-by-Example](https://www.cs.indiana.edu/ftp/techreports/TR206.pdf)"
-(PDF link).
+このシステムは「[Macro-by-Example](https://www.cs.indiana.edu/ftp/techreports/TR206.pdf)」（PDFリンク）に基づきます。
 
-# Hygiene
+# 健全性
 
-Some languages implement macros using simple text substitution, which leads to
-various problems. For example, this C program prints `13` instead of the
-expected `25`.
+いくつかの言語はマクロを単純なテキストの置換を使って実装していて、それは様々な問題をもたらします。
+例えば、このCプログラムは期待される`25`ではなく`13`をプリントします。
 
 ```text
 #define FIVE_TIMES(x) 5 * x
@@ -242,10 +226,9 @@ int main() {
 }
 ```
 
-After expansion we have `5 * 2 + 3`, and multiplication has greater precedence
-than addition. If you’ve used C macros a lot, you probably know the standard
-idioms for avoiding this problem, as well as five or six others. In Rust, we
-don’t have to worry about it.
+展開後、私たちは`5 * 2 + 3`を得ます。そして乗算は加算よりも高い優先順位を持ちます。
+もしあなたがCのマクロをたくさん使っているならば、あなたはおそらくこの問題を回避するための標準的な慣習を5、6個くらい知っているでしょう。
+Rustでは私たちはそれについて心配する必要がありません。
 
 ```rust
 macro_rules! five_times {
@@ -257,11 +240,10 @@ fn main() {
 }
 ```
 
-The metavariable `$x` is parsed as a single expression node, and keeps its
-place in the syntax tree even after substitution.
+メタ変数`$x`は1つの式ノードとしてパースされ、置換後も構文木のその場所にとどまります。
 
-Another common problem in macro systems is ‘variable capture’. Here’s a C
-macro, using [a GNU C extension] to emulate Rust’s expression blocks.
+マクロシステムでのもう1つの一般的な問題は「変数捕捉」です。
+これはRustの式ブロックをエミュレートするために[GNU C拡張][a GNU C extension]を使ったCのマクロです。
 
 [a GNU C extension]: https://gcc.gnu.org/onlinedocs/gcc/Statement-Exprs.html
 
@@ -274,14 +256,14 @@ macro, using [a GNU C extension] to emulate Rust’s expression blocks.
 })
 ```
 
-Here’s a simple use case that goes terribly wrong:
+これは恐ろしい間違いを起こす単純な利用場面です。
 
 ```text
 const char *state = "reticulating splines";
 LOG(state)
 ```
 
-This expands to
+この例は次のように展開されます。
 
 ```text
 const char *state = "reticulating splines";
@@ -291,10 +273,10 @@ if (state > 0) {
 }
 ```
 
-The second variable named `state` shadows the first one.  This is a problem
-because the print statement should refer to both of them.
+`state`と名付けられた2つ目の変数は1つ目を隠蔽します。
+print文はそれらの両方を参照すべきなので、これは問題です。
 
-The equivalent Rust macro has the desired behavior.
+同等なRustのマクロは望ましい挙動を持ちます。
 
 ```rust
 # fn get_log_state() -> i32 { 3 }
@@ -313,16 +295,14 @@ fn main() {
 }
 ```
 
-This works because Rust has a [hygienic macro system]. Each macro expansion
-happens in a distinct ‘syntax context’, and each variable is tagged with the
-syntax context where it was introduced. It’s as though the variable `state`
-inside `main` is painted a different "color" from the variable `state` inside
-the macro, and therefore they don’t conflict.
+Rustは[健全なマクロシステム][hygienic macro system]を持つので、これは動きます。
+各マクロ展開は別個の「構文文脈」の中で起き、各変数はそれが導入された構文文脈でタグ付けされます。
+それは`main`の中の変数`state`がマクロの中の変数`state`とは異なる「色」で塗られるようなもので、そのためそれらは衝突しません。
 
 [hygienic macro system]: https://en.wikipedia.org/wiki/Hygienic_macro
 
-This also restricts the ability of macros to introduce new bindings at the
-invocation site. Code such as the following will not work:
+これはまた、新しい束縛を実行地点で導入するマクロの能力を制限します。
+次のようなコードは動かないでしょう。
 
 ```rust,ignore
 macro_rules! foo {
@@ -335,8 +315,7 @@ fn main() {
 }
 ```
 
-Instead you need to pass the variable name into the invocation, so it’s tagged
-with the right syntax context.
+代わりにあなたは変数名を実行文に渡す必要があり、そしてそれは正しい構文文脈でタグ付けされます。
 
 ```rust
 macro_rules! foo {
@@ -349,8 +328,8 @@ fn main() {
 }
 ```
 
-This holds for `let` bindings and loop labels, but not for [items][items].
-So the following code does compile:
+これは`let`束縛とループラベルを予約しますが、[アイテム][items]は予約しません。
+そのため、次のコードはコンパイルできます。
 
 ```rust
 macro_rules! foo {
@@ -365,12 +344,10 @@ fn main() {
 
 [items]: ../reference.html#items
 
-# Recursive macros
+# 再帰的マクロ
 
-A macro’s expansion can include more macro invocations, including invocations
-of the very same macro being expanded.  These recursive macros are useful for
-processing tree-structured input, as illustrated by this (simplistic) HTML
-shorthand:
+マクロ展開は、展開されているものと全く同じマクロの実行を含む、別のマクロの実行を含むことができます。
+それらの再帰的マクロはこの（単純化した）HTMLの省略記法が例示するような木構造の入力を処理するのに便利です。
 
 ```rust
 # #![allow(unused_must_use)]
@@ -404,129 +381,111 @@ fn main() {
 }
 ```
 
-# Debugging macro code
+# マクロコードのデバッグ
 
-To see the results of expanding macros, run `rustc --pretty expanded`. The
-output represents a whole crate, so you can also feed it back in to `rustc`,
-which will sometimes produce better error messages than the original
-compilation. Note that the `--pretty expanded` output may have a different
-meaning if multiple variables of the same name (but different syntax contexts)
-are in play in the same scope. In this case `--pretty expanded,hygiene` will
-tell you about the syntax contexts.
+マクロ展開の結果を見るためには`rustc --pretty expanded`を実行します。
+出力は全てのクレートを表現するので、あなたはそれを`rustc`にフィードバックすることもできます。それはときどき元のコンパイルよりもよいエラーメッセージを生成するでしょう。
+複数の同じ名前の（ただし異なった構文文脈を持つ）変数が同じスコープの中に存在する場合、`--pretty expanded`の出力は異なった意味を持つことがあることに注意しましょう。
+この場合、`--pretty expanded,hygiene`はあなたに構文文脈について教えるでしょう。
 
-`rustc` provides two syntax extensions that help with macro debugging. For now,
-they are unstable and require feature gates.
+`rustc`はマクロのデバッグを手助けする2つの構文拡張を提供します。
+今のところ、それらは不安定で機能ゲートを必要とします。
 
-* `log_syntax!(...)` will print its arguments to standard output, at compile
-  time, and "expand" to nothing.
+* `log_syntax!(...)`はその引数をコンパイル時に標準出力にプリントし、何も「展開」しないであろう
+* `trace_macros!(true)`はマクロが展開される度にコンパイラーのメッセージを有効にするであろう。
+   展開の後でそれをオフにするには`trace_macros!(false)`を使うこと
 
-* `trace_macros!(true)` will enable a compiler message every time a macro is
-  expanded. Use `trace_macros!(false)` later in expansion to turn it off.
+# 構文上の要求
 
-# Syntactic requirements
-
-Even when Rust code contains un-expanded macros, it can be parsed as a full
-[syntax tree][ast]. This property can be very useful for editors and other
-tools that process code. It also has a few consequences for the design of
-Rust’s macro system.
+Rustのコードが未展開のマクロを含むときでさえ、それは完全な[構文木][ast]にパースすることができます。
+この特性はコードを処理するエディターや他のツールにとって非常に便利です。
+それはまた、Rustのマクロシステムの設計のためにいくつかの結果を持ちます。
 
 [ast]: glossary.html#abstract-syntax-tree
 
-One consequence is that Rust must determine, when it parses a macro invocation,
-whether the macro stands in for
+1つの結果は、マクロの実行をパースするとき、マクロが次の中のどれになるのかをRustが決定しなければならないということです。
 
-* zero or more items,
-* zero or more methods,
-* an expression,
-* a statement, or
-* a pattern.
+* 0以上のアイテム
+* 0以上のメソッド
+* 式
+* 文
+* パターン
 
-A macro invocation within a block could stand for some items, or for an
-expression / statement. Rust uses a simple rule to resolve this ambiguity. A
-macro invocation that stands for items must be either
+ブロック内でのマクロの実行はいくつかのアイテム、つまり式又は文の可能性があります。
+Rustはこの曖昧さを解決するために単純なルールを使います。
+アイテムになるマクロの実行は次の中のどれかでなければなりません。
 
-* delimited by curly braces, e.g. `foo! { ... }`, or
-* terminated by a semicolon, e.g. `foo!(...);`
+* 波括弧で範囲を定められている。例えば`foo! {...}`
+* 又はセミコロンで終わっている。例えば`fpp!(...);`
 
-Another consequence of pre-expansion parsing is that the macro invocation must
-consist of valid Rust tokens. Furthermore, parentheses, brackets, and braces
-must be balanced within a macro invocation. For example, `foo!([)` is
-forbidden. This allows Rust to know where the macro invocation ends.
+展開前のパースのもう1つの結果は、マクロの実行は正しいRustのトークンから成り立っていなければならないということです。
+その上、丸括弧、角括弧、波括弧はマクロの実行中はバランスしていなければなりません。
+例えば`foo!([)`は禁じられます。
+これによってRustはどこでマクロの実行が終わるのかを知ることが可能になります。
 
-More formally, the macro invocation body must be a sequence of ‘token trees’.
-A token tree is defined recursively as either
+もっと正式には、マクロ実行の本文は「トークン木」のシーケンスでなければなりません。
+トークン木は次の中のどれかとして再帰的に定義されます。
 
-* a sequence of token trees surrounded by matching `()`, `[]`, or `{}`, or
-* any other single token.
+* マッチする`()`、`[]`、`{}`で囲まれたトークン木のシーケンス
+* 又は他の1つのトークン
 
-Within a matcher, each metavariable has a ‘fragment specifier’, identifying
-which syntactic form it matches.
+マッチャー内で、各メタ変数は「フラグメント指定子」を持ち、どの文法形式がそれにマッチするのかを特定します。
 
-* `ident`: an identifier. Examples: `x`; `foo`.
-* `path`: a qualified name. Example: `T::SpecialA`.
-* `expr`: an expression. Examples: `2 + 2`; `if true then { 1 } else { 2 }`; `f(42)`.
-* `ty`: a type. Examples: `i32`; `Vec<(char, String)>`; `&T`.
-* `pat`: a pattern. Examples: `Some(t)`; `(17, 'a')`; `_`.
-* `stmt`: a single statement. Example: `let x = 3`.
-* `block`: a brace-delimited sequence of statements. Example:
-  `{ log(error, "hi"); return 12; }`.
-* `item`: an [item][item]. Examples: `fn foo() { }`; `struct Bar;`.
-* `meta`: a "meta item", as found in attributes. Example: `cfg(target_os = "windows")`.
-* `tt`: a single token tree.
+* `ident`：識別子。例：`x`、`foo`
+* `path`：修飾名。例：`T::SpecialA`
+* `expr`：式。例：`2 + 2`、`if true then { 1 } else { 2 }`、`f(42)`.
+* `ty`：型。例：`i32`、`Vec<(char, String)>`、`&T`
+* `pat`：パターン。例：`Some(t)`、`(17, 'a')`、`_`
+* `stmt`：1つの文。例：`let x = 3`
+* `block`：波括弧で範囲を定められた一連の文。例：`{ log(error, "hi"); return 12; }`
+* `item`：[アイテム][item]。例：`fn foo() { }`、`struct Bar;`
+* `meta`：属性内で見られるような「メタアイテム」。例：`cfg(target_os = "windows")`
+* `tt`：1つのトークン木
 
-There are additional rules regarding the next token after a metavariable:
+メタ変数の後に続くトークンに関連する追加のルールがあります。
 
-* `expr` variables may only be followed by one of: `=> , ;`
-* `ty` and `path` variables may only be followed by one of: `=> , : = > as`
-* `pat` variables may only be followed by one of: `=> , = if in`
-* Other variables may be followed by any token.
+* `expr`変数は`=> , ;`の中の1つだけを後に続けてもよい
+* `ty`変数と`path`変数は`=> , : = > as`の中の1つだけを後に続けてもよい
+* `pat`変数は`=> , = if in`の中の1つだけを後に続けてもよい
+* 他の変数は任意のトークンを後に続けてもよい
 
-These rules provide some flexibility for Rust’s syntax to evolve without
-breaking existing macros.
+それらのルールは既存のマクロを破壊することなくRustの構文に進化への一定の柔軟性を提供します。
 
-The macro system does not deal with parse ambiguity at all. For example, the
-grammar `$($t:ty)* $e:expr` will always fail to parse, because the parser would
-be forced to choose between parsing `$t` and parsing `$e`. Changing the
-invocation syntax to put a distinctive token in front can solve the problem. In
-this case, you can write `$(T $t:ty)* E $e:exp`.
+マクロシステムはパースの曖昧さを全く扱いません。
+例えば、文法`$($t:ty)* $e:expr`は常にパースに失敗するでしょう。なぜなら、パーサーは`$t`のパースと`$e`のパースのどちらかを選ぶことを強制されるからです。
+区別するためのトークンを前に置くことで実行構文を変更することは問題を解決します。
+この場合、あなたは`$(T $t:ty)* E $e:exp`と書くことができます。
 
 [item]: ../reference.html#items
 
-# Scoping and macro import/export
+# スコーピングとマクロのインポート・エクスポート
 
-Macros are expanded at an early stage in compilation, before name resolution.
-One downside is that scoping works differently for macros, compared to other
-constructs in the language.
+マクロはコンパイルの初期段階、名前解決の前に展開されます。
+欠点の1つは、言語内の他の構成物と比べて、マクロではスコーピングが異なる動作をすることです。
 
-Definition and expansion of macros both happen in a single depth-first,
-lexical-order traversal of a crate’s source. So a macro defined at module scope
-is visible to any subsequent code in the same module, which includes the body
-of any subsequent child `mod` items.
+マクロの定義と展開は両方ともクレートのソースに対する1つの深さ優先、辞書順の走査内で起こります。
+そして、モジュールのスコープで定義されたマクロは同じモジュール内の後続の任意のコードから見えます。そのモジュールは後続の任意の子`mod`アイテムの本文を含みます。
 
-A macro defined within the body of a single `fn`, or anywhere else not at
-module scope, is visible only within that item.
+1つの`fn`の本文内、つまりモジュールのスコープ以外のどこかで定義されたマクロはそのアイテム内からだけ見えます。
 
-If a module has the `macro_use` attribute, its macros are also visible in its
-parent module after the child’s `mod` item. If the parent also has `macro_use`
-then the macros will be visible in the grandparent after the parent’s `mod`
-item, and so forth.
+もしモジュールが`macro_use`属性を持っていれば、そのマクロはその親モジュール内の子の`mod`アイテム以降からも見えます。
+もし親も`macro_use`を持っていれば、そのときはマクロは祖父母内の親の`mod`アイテム以降からも見えるでしょう。そして同じように続きます。
 
-The `macro_use` attribute can also appear on `extern crate`. In this context
-it controls which macros are loaded from the external crate, e.g.
+`macro_use`属性は`extern crate`でも現れることがあります。
+この文脈ではそれはどのマクロが外部クレートから読み込まれるのかを制御します。例を示します。
 
 ```rust,ignore
 #[macro_use(foo, bar)]
 extern crate baz;
 ```
 
-If the attribute is given simply as `#[macro_use]`, all macros are loaded. If
-there is no `#[macro_use]` attribute then no macros are loaded. Only macros
-defined with the `#[macro_export]` attribute may be loaded.
+もし属性が単に`#[macro_use]`として与えられるならば、全てのマクロが読み込まれます。
+もし`#[macro_use]`属性がなければ、どのマクロも読み込まれません。
+`#[macro_export]`属性を付けて定義されたマクロだけが読み込まれるでしょう。
 
-To load a crate’s macros without linking it into the output, use `#[no_link]`
-as well.
+クレートのマクロを出力にリンクすることなく読み込むには、同様に`#[no_link]`を使いましょう。
 
-An example:
+例を示します。
 
 ```rust
 macro_rules! m1 { () => (()) }
@@ -561,16 +520,14 @@ mod bar {
 # fn main() { }
 ```
 
-When this library is loaded with `#[macro_use] extern crate`, only `m2` will
-be imported.
+このライブラリーが`#[macro_use] extern crate`付きで読み込まれるとき、`m2`だけがインポートされるでしょう。
 
-The Rust Reference has a [listing of macro-related
-attributes](../reference.html#macro-related-attributes).
+Rustのリファレンスには[マクロ関連の属性のリスト](../reference.html#macro-related-attributes)があります。
 
-# The variable `$crate`
+# `$crate`変数
 
-A further difficulty occurs when a macro is used in multiple crates. Say that
-`mylib` defines
+マクロが複数のクレート内で使われるとき、さらに難しいことが起きます。
+例えば、`mylib`を次のとおり定義したとします。
 
 ```rust
 pub fn increment(x: u32) -> u32 {
@@ -589,15 +546,13 @@ macro_rules! inc_b {
 # fn main() { }
 ```
 
-`inc_a` only works within `mylib`, while `inc_b` only works outside the
-library. Furthermore, `inc_b` will break if the user imports `mylib` under
-another name.
+`inc_a`は`mylib`内でだけ動作します。一方、`inc_b`はライブラリーの外でだけ動作します。
+さらに、もしユーザーが`mylib`を他の名前でインポートすれば、`inc_b`は壊れるでしょう。
 
-Rust does not (yet) have a hygiene system for crate references, but it does
-provide a simple workaround for this problem. Within a macro imported from a
-crate named `foo`, the special macro variable `$crate` will expand to `::foo`.
-By contrast, when a macro is defined and then used in the same crate, `$crate`
-will expand to nothing. This means we can write
+Rustは（まだ）クレートの参照のための健全なシステムを持っていませんが、それはこの問題に対する単純な回避策を提供します。
+`foo`と名付けられたクレートからインポートされたマクロ内では、特別なマクロ変数`$crate`が`::foo`へと展開されるでしょう。
+対照的に、マクロが定義され、それから同じクレート内で使われたとき、`$crate`は何にも展開されません。
+これは私たちが次のように書くことができることを意味します。
 
 ```rust
 #[macro_export]
@@ -607,23 +562,17 @@ macro_rules! inc {
 # fn main() { }
 ```
 
-to define a single macro that works both inside and outside our library. The
-function name will expand to either `::increment` or `::mylib::increment`.
+これは私たちのライブラリーの内側と外側の両方で動作する1つのマクロを定義します。
 
-To keep this system simple and correct, `#[macro_use] extern crate ...` may
-only appear at the root of your crate, not inside `mod`. This ensures that
-`$crate` is a single identifier.
+このシステムを単純で正しく保つために、`#[macro_use] extern crate ...`は`mod`内ではなくあなたのクレートのルートにだけ現れるでしょう。
+これは`$crate`が1つの識別子であることを保証します。
 
-# The deep end
+# 奥の方
 
-The introductory chapter mentioned recursive macros, but it did not give the
-full story. Recursive macros are useful for another reason: Each recursive
-invocation gives you another opportunity to pattern-match the macro’s
-arguments.
+導入的な章で再帰的マクロに言及しましたが、それは完全なストーリーを与えませんでした。
+再帰マクロはもう1つの理由で便利です。つまり、各再帰実行があなたにマクロ引数のもう一度パターンマッチの機会を与えるということです。
 
-As an extreme example, it is possible, though hardly advisable, to implement
-the [Bitwise Cyclic Tag](https://esolangs.org/wiki/Bitwise_Cyclic_Tag) automaton
-within Rust’s macro system.
+極端な例として、決して得策とは言えませんが、[ビットワイズ循環タグシステム](https://esolangs.org/wiki/Bitwise_Cyclic_Tag)オートマトンをRustのマクロシステム内で実装することが可能です。
 
 ```rust
 macro_rules! bct {
@@ -649,17 +598,16 @@ macro_rules! bct {
 }
 ```
 
-Exercise: use macros to reduce duplication in the above definition of the
-`bct!` macro.
+練習問題：`bct!`マクロの上の定義内の重複を減らすためにマクロを使いなさい。
 
-# Common macros
+# 一般的なマクロ
 
-Here are some common macros you’ll see in Rust code.
+これらはあなたがRustのコードで見るであろういくつかの一般的なマクロです。
 
 ## panic!
 
-This macro causes the current thread to panic. You can give it a message
-to panic with:
+このマクロは現在のスレッドをパニックさせます。
+あなたはそれにパニックに付けるメッセージを与えることができます。
 
 ```rust,no_run
 panic!("oh no!");
@@ -667,25 +615,27 @@ panic!("oh no!");
 
 ## vec!
 
-The `vec!` macro is used throughout the book, so you’ve probably seen it
-already. It creates `Vec<T>`s with ease:
+`vec!`マクロは本書を通じて使われるので、あなたはおそらくそれを既に見ているでしょう。
+それは`Vec<T>`を容易に作ります。
 
 ```rust
 let v = vec![1, 2, 3, 4, 5];
 ```
 
-It also lets you make vectors with repeating values. For example, a hundred
-zeroes:
+それによってあなたはベクターを繰り返す値とともに作ることができます。
+例えば、100個の0であれば、次のようになります。
 
 ```rust
 let v = vec![0; 100];
 ```
 
-## assert! and assert_eq!
+## assert!とassert_eq!
 
-These two macros are used in tests. `assert!` takes a boolean. `assert_eq!`
-takes two values and checks them for equality. `true` passes, `false` `panic!`s.
-Like this:
+これら2つのマクロはテストで使われます。
+`assert!`はブーリアンを受け取ります。
+`assert_eq!`は2つの値を受け取り、それらの相等性をチェックします。
+`true`は成功し、`false`は`panic!`します。
+例えば、このようになります。
 
 ```rust,no_run
 // A-ok!
@@ -701,9 +651,9 @@ assert_eq!(5, 3);
 
 ## try!
 
-`try!` is used for error handling. It takes something that can return a
-`Result<T, E>`, and gives `T` if it’s a `Ok<T>`, and `return`s with the
-`Err(E)` if it’s that. Like this:
+`try!`はエラー処理に使われます。
+それは`Result<T, E>`を戻す可能性のある何かを受け取り、それが`Ok<T>`であれば`T`を与え、それが`Err(E)`であれば、それとともに`return`します。
+例えば、このようになります。
 
 ```rust,no_run
 use std::fs::File;
@@ -715,7 +665,7 @@ fn foo() -> std::io::Result<()> {
 }
 ```
 
-This is cleaner than doing this:
+これは次のようにするよりもきれいです。
 
 ```rust,no_run
 use std::fs::File;
@@ -734,7 +684,7 @@ fn foo() -> std::io::Result<()> {
 
 ## unreachable!
 
-This macro is used when you think some code should never execute:
+このマクロはあなたがあるコードが絶対に実行されるべきではないと考えるときに使われます。
 
 ```rust
 if false {
@@ -742,9 +692,8 @@ if false {
 }
 ```
 
-Sometimes, the compiler may make you have a different branch that you know
-will never, ever run. In these cases, use this macro, so that if you end
-up wrong, you’ll get a `panic!` about it.
+ときどき、あなたが決して実行されないであろうことを知っている異なった肢をコンパイラーがあなたに持たせることがあります。
+そのような場合、あなたが間違って行き着いたときにそれが`panic!`を起こすように、このマクロを使いましょう。
 
 ```rust
 let x: Option<i32> = None;
@@ -757,17 +706,13 @@ match x {
 
 ## unimplemented!
 
-The `unimplemented!` macro can be used when you’re trying to get your functions
-to typecheck, and don’t want to worry about writing out the body of the
-function. One example of this situation is implementing a trait with multiple
-required methods, where you want to tackle one at a time. Define the others
-as `unimplemented!` until you’re ready to write them.
+`unimplemented!`マクロはあなたがあなたの関数に型チェックを受けさせようとするときで、関数本文を書き上げることについて心配したくないときに使うことができます。
+この状況の一例は、複数の要求されるメソッドを持つトレイトの実装に、あなたが一度に取り組みたい場合です。
+あなたがそれらを書く準備ができるまで、それらを`unimplemented!`として定義しましょう。
 
-# Procedural macros
+# 手続マクロ
 
-If Rust’s macro system can’t do what you need, you may want to write a
-[compiler plugin](compiler-plugins.html) instead. Compared to `macro_rules!`
-macros, this is significantly more work, the interfaces are much less stable,
-and bugs can be much harder to track down. In exchange you get the
-flexibility of running arbitrary Rust code within the compiler. Syntax
-extension plugins are sometimes called ‘procedural macros’ for this reason.
+もしRustのマクロシステムがあなたの必要とすることをできないのであれば、あなたは代わりに[コンパイラープラグイン](compiler-plugins.html)を書きたいと思うかもしれません。
+`macro_rules!`マクロと比較して、これはかなり大きな仕事で、インターフェイスの安定性は下がり、バグはを追い詰めにくくなる可能性があります。
+引き換えにあなたはコンパイラー内で任意のRustのコードを実行する柔軟性を得ます。
+構文拡張プラグインはこの理由からときどき「手続マクロ」と呼ばれることがあります。

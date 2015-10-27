@@ -54,7 +54,7 @@
     * [Unsized Types](unsized-types.md)
     * [Operators and Overloading](operators-and-overloading.md)
     * [Deref coercions](deref-coercions.md)
-    * [Macros](macros.md)
+    * [マクロ](macros.md)
     * [Raw Pointers](raw-pointers.md)
     * [`unsafe`](unsafe.md)
 * [Nightly Rust](nightly-rust.md)
