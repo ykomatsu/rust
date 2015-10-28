@@ -1,7 +1,7 @@
 % BorrowとAsRef
 
 [`Borrow`][borrow]トレイトと[`AsRef`][asref]トレイトは非常に似ていますが、別物です。
-これはそれら2つのトレイトが意味するものについて簡単に記憶を整理するものです。
+これはそれら2つのトレイトが意味するものについての簡単な復習です。
 
 [borrow]: ../std/borrow/trait.Borrow.html
 [asref]: ../std/convert/trait.AsRef.html
