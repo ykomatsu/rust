@@ -1,7 +1,6 @@
-% Enums
+% 列挙型
 
-An `enum` in Rust is a type that represents data that could be one of
-several possible variants:
+Rustでの`enum`はいくつかの採り得る値の中の1つにできるデータを表現する型です。
 
 ```rust
 enum Message {
@@ -12,17 +11,14 @@ enum Message {
 }
 ```
 
-Each variant can optionally have data associated with it. The syntax for
-defining variants resembles the syntaxes used to define structs: you can
-have variants with no data (like unit-like structs), variants with named
-data, and variants with unnamed data (like tuple structs). Unlike
-separate struct definitions, however, an `enum` is a single type. A
-value of the enum can match any of the variants. For this reason, an
-enum is sometimes called a ‘sum type’: the set of possible values of the
-enum is the sum of the sets of possible values for each variant.
+各バリアントはオプションとしてそれに関連付けられる値を持つことができます。
+バリアントを定義する構文は構造体を定義するために使われる構文に似ています。つまり、あなたはデータを持たない（ユニット的構造体のような）バリアント、名前付きデータを持つバリアント、無名データを持つ（タプル構造体のような）バリアントを持つことができます。
+しかし、各部分に分かれている構造体の定義とは違って、`enum`は1つの型です。
+列挙型の値はどのバリアントにもマッチすることができます。
+この理由から、列挙型はときどき「直和型」と呼ばれます。列挙型の採り得る値のセットは各バリアントの採り得る値のセットの直和です。
 
-We use the `::` syntax to use the name of each variant: they’re scoped by the name
-of the `enum` itself. This allows both of these to work:
+私たちは`::`構文を各バリアントの名前を使うために使います。それらは`enum`自体の名前のスコープを持ちます。
+これによって次のものの両方が動作することが可能になります。
 
 ```rust
 # enum Message {
@@ -38,16 +34,12 @@ enum BoardGameTurn {
 let y: BoardGameTurn = BoardGameTurn::Move { squares: 1 };
 ```
 
-Both variants are named `Move`, but since they’re scoped to the name of
-the enum, they can both be used without conflict.
+両方のバリアントは`Move`と名付けられますが、それらは列挙型の名前のスコープを持つので、それらは両方とも衝突することなく使うことができます。
 
-A value of an enum type contains information about which variant it is,
-in addition to any data associated with that variant. This is sometimes
-referred to as a ‘tagged union’, since the data includes a ‘tag’
-indicating what type it is. The compiler uses this information to
-enforce that you’re accessing the data in the enum safely. For instance,
-you can’t simply try to destructure a value as if it were one of the
-possible variants:
+列挙型の値はそれがどのバリアントなのか、加えてそのバリアントに関連付けられる任意のデータについての情報を含みます。
+データがそれが何の型なのかを示す「タグ」を含むため、これはときどき「タグ付き共用体」と呼ばれます。
+コンパイラーはこの情報をあなたが列挙型の中のデータに安全にアクセスすることを強制するために使います。
+例えば、あなたは値が採り得るバリアントの1つであるかのようにそれを単純に分配束縛しようとすることができません。
 
 ```rust,ignore
 fn process_color_change(msg: Message) {
@@ -55,19 +47,18 @@ fn process_color_change(msg: Message) {
 }
 ```
 
-Not supporting these operations may seem rather limiting, but it’s a limitation
-which we can overcome. There are two ways: by implementing equality ourselves,
-or by pattern matching variants with [`match`][match] expressions, which you’ll
-learn in the next section. We don’t know enough about Rust to implement
-equality yet, but we’ll find out in the [`traits`][traits] section.
+それらの作業をサポートしないことはむしろ制限のように見えるかもしれません。しかし、それは乗り越えることができる制限です。
+それには2つの方法があります。私たち自身で相等性を実装すること、又はあなたが次のセクションで学ぶであろうパターンマッチをバリアントに対して[`match`][match]式を使って行うことです。
+私たちはRustについて相等性を実装するために必要なほど十分にはまだ知りません。しかし、私たちは[`traits`][traits]セクションで知るでしょう。
 
 [match]: match.html
 [if-let]: if-let.html
 [traits]: traits.html
 
-# Constructors as functions
+# 関数としてのコンストラクター
 
-An enum’s constructors can also be used like functions. For example:
+列挙型のコンストラクターは関数のようにも使うことができます。
+例えばこのようにです。
 
 ```rust
 # enum Message {
@@ -76,7 +67,7 @@ An enum’s constructors can also be used like functions. For example:
 let m = Message::Write("Hello, world".to_string());
 ```
 
-Is the same as
+これは次のものと同じです。
 
 ```rust
 # enum Message {
@@ -89,10 +80,8 @@ fn foo(x: String) -> Message {
 let x = foo("Hello, world".to_string());
 ```
 
-This is not immediately useful to us, but when we get to
-[`closures`][closures], we’ll talk about passing functions as arguments to
-other functions. For example, with [`iterators`][iterators], we can do this
-to convert a vector of `String`s into a vector of `Message::Write`s:
+これは私たちにすぐに便利なものではありませんが、私たちが[`closures`][closures]を手に入れるとき、私たちは他の関数の引数として関数を渡す方法について話すでしょう。
+例えば、[`iterators`][iterators]を使って、私たちは`String`のベクターを`Message::Write`のベクターに変換するためにこれをすることができます。
 
 ```rust
 # enum Message {

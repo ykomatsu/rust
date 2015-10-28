@@ -32,7 +32,7 @@
     * [生存期間](lifetimes.md)
     * [ミュータビリティー](mutability.md)
     * [構造体](structs.md)
-    * [Enums](enums.md)
+    * [列挙型](enums.md)
     * [Match](match.md)
     * [Patterns](patterns.md)
     * [Method Syntax](method-syntax.md)
