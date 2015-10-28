@@ -1,14 +1,13 @@
-% Patterns
+% パターン
 
-Patterns are quite common in Rust. We use them in [variable
-bindings][bindings], [match statements][match], and other places, too. Let’s go
-on a whirlwind tour of all of the things patterns can do!
+パターンはRustでは非常に一般的です。
+私たちはそれらを[変数束縛][bindings]、[マッチ文][match]、そして他の場所でも使います。
+パターンにできること全てのための弾丸ツアーに出発しましょう！
 
 [bindings]: variable-bindings.html
 [match]: match.html
 
-A quick refresher: you can match against literals directly, and `_` acts as an
-‘any’ case:
+簡単な復習です。あなたはリテラルに対して直接にマッチすることができ、`_`は「任意の」場合のように振る舞います。
 
 ```rust
 let x = 1;
@@ -21,10 +20,10 @@ match x {
 }
 ```
 
-This prints `one`.
+これは`one`をプリントします。
 
-There’s one pitfall with patterns: like anything that introduces a new binding,
-they introduce shadowing. For example:
+そこにはパターンの1つの落とし穴があります。新しい束縛を導入する全てのものと同様に、それらはシャドーイングを導入するのです。
+例えばこうです。
 
 ```rust
 let x = 'x';
@@ -37,20 +36,19 @@ match c {
 println!("x: {}", x)
 ```
 
-This prints:
+これは次のものをプリントします。
 
 ```text
 x: c c: c
 x: x
 ```
 
-In other words, `x =>` matches the pattern and introduces a new binding named
-`x` that’s in scope for the match arm. Because we already have a binding named
-`x`, this new `x` shadows it.
+言い換えると、`x =>`はパターンにマッチし、`x`という名前の新しい束縛を導入するということです。そしてその束縛はマッチ肢のスコープ内にあります。
+私たちは既に`x`という名前の束縛を持つので、この新しい`x`はそれを隠蔽します。
 
-# Multiple patterns
+# 複数のパターン
 
-You can match multiple patterns with `|`:
+あなたは`|`を使って複数のパターンにマッチすることができます。
 
 ```rust
 let x = 1;
@@ -62,12 +60,11 @@ match x {
 }
 ```
 
-This prints `one or two`.
+これは`one or two`をプリントします。
 
-# Destructuring
+# 分配束縛
 
-If you have a compound data type, like a [`struct`][struct], you can destructure it
-inside of a pattern:
+もしあなたが[`struct`][struct]のような合成データ型を持つのならば、あなたはそれをパターン内で分配束縛することができます。
 
 ```rust
 struct Point {
@@ -84,7 +81,7 @@ match origin {
 
 [struct]: structs.html
 
-We can use `:` to give a value a different name.
+私たちは値に別の名前を与えるために`:`を使うことができます。
 
 ```rust
 struct Point {
@@ -99,7 +96,7 @@ match origin {
 }
 ```
 
-If we only care about some of the values, we don’t have to give them all names:
+もし私たちが値の中のいくつかにしか興味がないのであれば、私たちはそれら全てに名前を付ける必要はありません。
 
 ```rust
 struct Point {
@@ -114,9 +111,9 @@ match origin {
 }
 ```
 
-This prints `x is 0`.
+これは`x is 0`をプリントします。
 
-You can do this kind of match on any member, not just the first:
+あなたはこの種のマッチを最初のメンバーだけでなく任意のメンバーに対して行うことができます。
 
 ```rust
 struct Point {
@@ -131,18 +128,17 @@ match origin {
 }
 ```
 
-This prints `y is 0`.
+これは`y is 0`をプリントします。
 
-This ‘destructuring’ behavior works on any compound data type, like
-[tuples][tuples] or [enums][enums].
+この「分配束縛」の挙動は[タプル][tuples]や[列挙型][enum]のような全ての合成データ型に対して有効です。
 
 [tuples]: primitive-types.html#tuples
 [enums]: enums.html
 
-# Ignoring bindings
+# 束縛の無視
 
-You can use `_` in a pattern to disregard the type and value.
-For example, here’s a `match` against a `Result<T, E>`:
+あなたは型と値を無視するために`_`をパターン内で使うことができます。
+例えばこれは`Result<T, E>`に`match`します。
 
 ```rust
 # let some_value: Result<i32, &'static str> = Err("There was an error");
@@ -152,12 +148,11 @@ match some_value {
 }
 ```
 
-In the first arm, we bind the value inside the `Ok` variant to `value`. But
-in the `Err` arm, we use `_` to disregard the specific error, and just print
-a general error message.
+最初の肢では私たちは`Ok`バリアント内の値を`value`に束縛します。
+しかし、`Err`肢では私たちは具体的なエラーを無視し、単純に一般的なエラーメッセージをプリントするために`_`を使います。
 
-`_` is valid in any pattern that creates a binding. This can be useful to
-ignore parts of a larger structure:
+`_`は束縛を作る任意のパターンで有効です。
+これは大きな構造の一部を無視するために便利なことがあります。
 
 ```rust
 fn coordinate() -> (i32, i32, i32) {
@@ -168,10 +163,9 @@ fn coordinate() -> (i32, i32, i32) {
 let (x, _, z) = coordinate();
 ```
 
-Here, we bind the first and last element of the tuple to `x` and `z`, but
-ignore the middle element.
+ここでは私たちはタプルの最初の要素と最後の要素を`x`と`z`に束縛しますが、間の要素は無視します。
 
-Similarly, you can use `..` in a pattern to disregard multiple values.
+同様に、あなたは複数の値を無視するために`..`をパターン内でを使うことができます。
 
 ```rust
 enum OptionalTuple {
@@ -187,11 +181,11 @@ match x {
 }
 ```
 
-This prints `Got a tuple!`.
+これは`Got a tuple!`をプリントします。
 
-# ref and ref mut
+# 参照とミュータブルな参照
 
-If you want to get a [reference][ref], use the `ref` keyword:
+もしあなたが[参照][ref]を得たいならば、`ref`キーワードを使いましょう。
 
 ```rust
 let x = 5;
@@ -201,13 +195,13 @@ match x {
 }
 ```
 
-This prints `Got a reference to 5`.
+これは`Got a reference to 5`をプリントします。
 
 [ref]: references-and-borrowing.html
 
-Here, the `r` inside the `match` has the type `&i32`. In other words, the `ref`
-keyword _creates_ a reference, for use in the pattern. If you need a mutable
-reference, `ref mut` will work in the same way:
+ここでは`match`内の`r`は`&i32`を持ちます。
+言い換えると、`ref`キーワードはパターンの中で使うための参照を _作る_ ということです。
+もしあなたがミュータブルな参照を必要ならば、`ref mut`が同じ方法で動作するでしょう。
 
 ```rust
 let mut x = 5;
@@ -217,9 +211,9 @@ match x {
 }
 ```
 
-# Ranges
+# レンジ
 
-You can match a range of values with `...`:
+あなたは値のレンジを`...`を使ってマッチすることができます。
 
 ```rust
 let x = 1;
@@ -230,9 +224,9 @@ match x {
 }
 ```
 
-This prints `one through five`.
+これは`one through five`をプリントします。
 
-Ranges are mostly used with integers and `char`s:
+レンジは大体整数と`char`で使われます。
 
 ```rust
 let x = '💅';
@@ -244,11 +238,11 @@ match x {
 }
 ```
 
-This prints `something else`.
+これは`something else`をプリントします。
 
-# Bindings
+# 束縛
 
-You can bind values to names with `@`:
+あなたは値を`@`という名前に束縛することができます。
 
 ```rust
 let x = 1;
@@ -259,8 +253,8 @@ match x {
 }
 ```
 
-This prints `got a range element 1`. This is useful when you want to
-do a complicated match of part of a data structure:
+これは`got a range element 1`をプリントします。
+これはあなたがデータ構造の一部に対して複雑なマッチを行いたいときに便利です。
 
 ```rust
 #[derive(Debug)]
@@ -276,10 +270,9 @@ match x {
 }
 ```
 
-This prints `Some("Steve")`: we’ve bound the inner `name` to `a`.
+これは`Some("Steve")`をプリントします。私たちは内側の`name`を`a`に束縛しました。
 
-If you use `@` with `|`, you need to make sure the name is bound in each part
-of the pattern:
+もしあなたが`@`を`|`とともに使うならば、あなたは名前がパターンの各部分で束縛されていることを確かめる必要があります。
 
 ```rust
 let x = 5;
@@ -290,9 +283,9 @@ match x {
 }
 ```
 
-# Guards
+# ガード
 
-You can introduce ‘match guards’ with `if`:
+あなたは`if`を使って「マッチガード」を導入することができます。
 
 ```rust
 enum OptionalInt {
@@ -309,9 +302,9 @@ match x {
 }
 ```
 
-This prints `Got an int!`.
+これは`Got an int!`をプリントします。
 
-If you’re using `if` with multiple patterns, the `if` applies to both sides:
+もしあなたが`if`を複数のパターンで使っているならば、`if`は両方の部分に適用されます。
 
 ```rust
 let x = 4;
@@ -323,23 +316,22 @@ match x {
 }
 ```
 
-This prints `no`, because the `if` applies to the whole of `4 | 5`, and not to
-just the `5`. In other words, the precedence of `if` behaves like this:
+`if`は`5`にだけではなく`4 | 5`の全体に適用されるので、これは`no`をプリントします。
+言い換えると、`if`の優先順位はこのように振る舞うということです。
 
 ```text
 (4 | 5) if y => ...
 ```
 
-not this:
+こうではありません。
 
 ```text
 4 | (5 if y) => ...
 ```
 
-# Mix and Match
+# マッチの混合
 
-Whew! That’s a lot of different ways to match things, and they can all be
-mixed and matched, depending on what you’re doing:
+ふう！　何かにマッチするためのたくさんの異なる方法がありました。そしてあなたがしようとしていることに応じて、それらは全て混合してマッチさせることができます。
 
 ```rust,ignore
 match x {
@@ -347,4 +339,5 @@ match x {
 }
 ```
 
-Patterns are very powerful. Make good use of them.
+パターンは非常に強力です。
+それらを上手に使いましょう。
