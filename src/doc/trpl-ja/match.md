@@ -1,9 +1,9 @@
-% Match
+% マッチ
 
-Often, a simple [`if`][if]/`else` isn’t enough, because you have more than two
-possible options. Also, conditions can get quite complex. Rust
-has a keyword, `match`, that allows you to replace complicated `if`/`else`
-groupings with something more powerful. Check it out:
+しばしば、あなたは2つ以上の採り得るオプションを持つため、単純な[`if`][if]/`else`は十分ではありません。
+また、条件は非常に複雑になることがあります。
+Rustは`match`キーワードを持ちます。それによってあなたは複雑な`if`/`else`のグループをより強力なものに置き換えることができるようになります。
+これを見ましょう。
 
 ```rust
 let x = 5;
@@ -20,32 +20,31 @@ match x {
 
 [if]: if.html
 
-`match` takes an expression and then branches based on its value. Each ‘arm’ of
-the branch is of the form `val => expression`. When the value matches, that arm’s
-expression will be evaluated. It’s called `match` because of the term ‘pattern
-matching’, which `match` is an implementation of. There’s an [entire section on
-patterns][patterns] that covers all the patterns that are possible here.
+`match`は式を受け取り、それからその値に基づいて分岐します。
+ブランチの各「肢」は`val => expression`という形式です。
+値がマッチするとき、その肢の式が評価されるでしょう。
+それは`match`と呼ばれますが、それは「パターンマッチング」という用語のためです。`match`はパターンマッチングの実装です。
+ここで利用可能な全てのパターンをカバーする[パターンについての1つのセクション][patterns]があります。
 
 [patterns]: patterns.html
 
-So what’s the big advantage? Well, there are a few. First of all, `match`
-enforces ‘exhaustiveness checking’. Do you see that last arm, the one with the
-underscore (`_`)? If we remove that arm, Rust will give us an error:
+それでは、何が大きな利点なのでしょうか。
+なるほど、それにはいくつかあります。
+まず最初に、`match`は「網羅的チェック」を強制します。
+あなたには最後の肢、アンダースコアの付いた肢が見えますか。
+もし私たちがその肢を削除すれば、Rustは私たちにエラーを出します。
 
 ```text
 error: non-exhaustive patterns: `_` not covered
 ```
 
-In other words, Rust is trying to tell us we forgot a value. Because `x` is an
-integer, Rust knows that it can have a number of different values – for
-example, `6`. Without the `_`, however, there is no arm that could match, and
-so Rust refuses to compile the code. `_` acts like a ‘catch-all arm’. If none
-of the other arms match, the arm with `_` will, and since we have this
-catch-all arm, we now have an arm for every possible value of `x`, and so our
-program will compile successfully.
+言い換えれば、Rustは私たちに私たちが値を忘れていると教えようとしているということです。
+`x`は整数なので、Rustはそれが別の値、例えば`6`などを持つ可能性があるということを知っています。
+しかし、`_`がなければ、それにマッチする可能性のある肢がなくなるため、Rustはコードのコンパイルを拒絶します。
+`_`は「キャッチオール肢」のように振る舞います。
+もし他のどの肢にもマッチしなければ、`_`の付いた肢がマッチするでしょう。そして、私たちはこのキャッチオール肢を持つので、私たちはもう`x`の採り得る全ての値のための肢を持つことになります。そして、私たちのプログラムはコンパイルに成功するでしょう。
 
-`match` is also an expression, which means we can use it on the right-hand
-side of a `let` binding or directly where an expression is used:
+`match`は式でもあります。それは私たちがそれを`let`束縛の右辺や式が使われる場所で直接に使うことができるということを意味します。
 
 ```rust
 let x = 5;
@@ -60,12 +59,11 @@ let number = match x {
 };
 ```
 
-Sometimes it’s a nice way of converting something from one type to another.
+ときどきそれは何かをある型から別の型に変換するよい方法であることがあります。
 
-# Matching on enums
+# 列挙型でのマッチ
 
-Another important use of the `match` keyword is to process the possible
-variants of an enum:
+`match`キーワードのもう1つの重要な使い方は列挙型の採り得る値を処理することです。
 
 ```rust
 enum Message {
@@ -88,13 +86,10 @@ fn process_message(msg: Message) {
     };
 }
 ```
+再びRustコンパイラーは網羅性をチェックします。そしてそれはあなたが列挙型の全てのバリアントにマッチする肢を持つことを要求します。
+もしあなたがそれをしなければ、あなたが`_`を使わない限り、それはコンパイル時エラーをあなたに出すでしょう。
 
-Again, the Rust compiler checks exhaustiveness, so it demands that you
-have a match arm for every variant of the enum. If you leave one off, it
-will give you a compile-time error unless you use `_`.
-
-Unlike the previous uses of `match`, you can’t use the normal `if`
-statement to do this. You can use the [`if let`][if-let] statement,
-which can be seen as an abbreviated form of `match`.
+前の`match`の使い方と異なり、あなたはこれをするために普通の`if`文を使うことができません。
+あなたは`match`の短縮形式のように見えることがある[`if let`][if-let]文を使うことができます。
 
 [if-let]: if-let.html

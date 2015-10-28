@@ -33,7 +33,7 @@
     * [ミュータビリティー](mutability.md)
     * [構造体](structs.md)
     * [列挙型](enums.md)
-    * [Match](match.md)
+    * [マッチ](match.md)
     * [Patterns](patterns.md)
     * [Method Syntax](method-syntax.md)
     * [Vectors](vectors.md)
