@@ -6,7 +6,7 @@
 
 プラグインは`rustc`に拡張を登録する指定された *レジストラー* 関数を持つ動的ライブラリークレートです。
 他のクレートはクレート属性`#![plugin(...)]`を使ってそれらの拡張を読み込むことができます。
-プラグインの定義と読込みの方法についてもっと知るためには[`rustc::plugin`](../rustc/plugin/index.html)ドキュメントを見ましょう。
+プラグインの定義と読込みの方法について詳しくは[`rustc::plugin`](../rustc/plugin/index.html)ドキュメントを見ましょう。
 
 もしあれば、`#![plugin(foo(... args ...))]`として渡された引数はrustc自体によって解釈されません。
 それらは`Registry`の[`args`メソッド](../rustc/plugin/registry/struct.Registry.html#method.args)を通じてプラグインに提供されます。
