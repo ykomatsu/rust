@@ -1,28 +1,25 @@
-% Vectors
+% ベクター
 
-A ‘vector’ is a dynamic or ‘growable’ array, implemented as the standard
-library type [`Vec<T>`][vec]. The `T` means that we can have vectors
-of any type (see the chapter on [generics][generic] for more).
-Vectors always allocate their data on the heap.
-You can create them with the `vec!` macro:
+「ベクター」は動的又は「伸ばすことのできる」配列で、標準ライブラリーの[`Vec<T>`][vec]型として実装されています。
+`T`は私たちが任意の型のベクターを持つことができるということを意味します（詳しくは[ジェネリック][generic]の章を見ましょう）。
+ベクターは常にそれらのデータをヒープ上に割り当てます。
+あなたはそれらを`vec!`マクロを使って作ることができます。
 
 ```rust
 let v = vec![1, 2, 3, 4, 5]; // v: Vec<i32>
 ```
 
-(Notice that unlike the `println!` macro we’ve used in the past, we use square
-brackets `[]` with `vec!` macro. Rust allows you to use either in either situation,
-this is just convention.)
+（私たちが過去に使っていた`println!`マクロと異なり、私たちは`vec!`マクロでは角括弧`[]`を使うことに注意しましょう。Rustでは私たちはどちらの状況でもどちらを使うこともできます。これは単なる慣習です。）
 
-There’s an alternate form of `vec!` for repeating an initial value:
+初期値を繰り返すために`vec!`には代わりの形式があります。
 
 ```rust
 let v = vec![0; 10]; // ten zeroes
 ```
 
-## Accessing elements
+## 要素のアクセス
 
-To get the value at a particular index in the vector, we use `[]`s:
+ベクターの特定のインデックスの値を取得するために、私たちは`[]`を使います。
 
 ```rust
 let v = vec![1, 2, 3, 4, 5];
@@ -30,9 +27,9 @@ let v = vec![1, 2, 3, 4, 5];
 println!("The third element of v is {}", v[2]);
 ```
 
-The indices count from `0`, so the third element is `v[2]`.
+インデックスは`0`からカウントするので、3番目の要素は`v[2]`です。
 
-It’s also important to note that you must index with the `usize` type:
+あなたが`usize`型でインデックスを指定しなければならないことに気付くことは重要です。
 
 ```ignore
 let v = vec![1, 2, 3, 4, 5];
@@ -47,7 +44,7 @@ v[i];
 v[j];
 ```
 
-Indexing with a non-`usize` type gives an error that looks like this:
+非`usize`型でインデックスを指定すると、このように見えるエラーが出ます。
 
 ```text
 error: the trait `core::ops::Index<i32>` is not implemented for the type
@@ -58,13 +55,12 @@ note: the type `collections::vec::Vec<_>` cannot be indexed by `i32`
 error: aborting due to previous error
 ```
 
-There’s a lot of punctuation in that message, but the core of it makes sense:
-you cannot index with an `i32`.
+そのメッセージの中にはたくさんの区切りがありますが、そのコアは意味を成しています。つまり、あなたは`i32`でインデックスを指定することはできないということです。
 
-## Iterating
+## 繰返し
 
-Once you have a vector, you can iterate through its elements with `for`. There
-are three versions:
+一旦あなたがベクターを持てば、あなたはその要素を`for`を使って繰り返すことができます。
+そこには3つのバージョンがあります。
 
 ```rust
 let mut v = vec![1, 2, 3, 4, 5];
@@ -82,8 +78,7 @@ for i in v {
 }
 ```
 
-Vectors have many more useful methods, which you can read about in [their
-API documentation][vec].
+ベクターにはもっとたくさんの便利なメソッドがあります。そしてあなたは[それらのAPIドキュメント][vec]でそれらについて読むことができます。
 
 [vec]: ../std/vec/index.html
 [generic]: generics.html

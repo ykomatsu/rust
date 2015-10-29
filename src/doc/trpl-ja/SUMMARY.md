@@ -36,7 +36,7 @@
     * [マッチ](match.md)
     * [パターン](patterns.md)
     * [メソッド構文](method-syntax.md)
-    * [Vectors](vectors.md)
+    * [ベクター](vectors.md)
     * [Strings](strings.md)
     * [Generics](generics.md)
     * [Traits](traits.md)
