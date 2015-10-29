@@ -164,7 +164,7 @@ let Inches(integer_length) = length;
 println!("length is {} inches", integer_length);
 ```
 
-ここであなたが見たとおり、ちょうど通常のタプルのように、あなたは分配束縛`let`を通じて内側の整数型を展開することができます。
+見てのとおり、ちょうど通常のタプルのように、あなたは分配束縛`let`を通じて内側の整数型を展開することができます。
 この場合、`let Inches(integer_length)`は`10`を`integer_length`に割り当てます。
 
 # ユニット的構造体
