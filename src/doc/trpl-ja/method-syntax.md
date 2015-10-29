@@ -1,26 +1,26 @@
-% Method Syntax
+% メソッド構文
 
-Functions are great, but if you want to call a bunch of them on some data, it
-can be awkward. Consider this code:
+関数はすばらしいですが、あなたがあるデータに対してそれらの集まりを呼び出したいとき、それは扱いにくくなることがあります。
+次のコードを考えましょう。
 
 ```rust,ignore
 baz(bar(foo));
 ```
 
-We would read this left-to-right, and so we see ‘baz bar foo’. But this isn’t the
-order that the functions would get called in, that’s inside-out: ‘foo bar baz’.
-Wouldn’t it be nice if we could do this instead?
+私たちはこれを左から右へと読み、そして私たちは「baz bar foo」と理解します。
+しかし、これは関数が呼び出される順番ではありません。それは内側から外側へという順番、「foo bar baz」です。
+私たちが代わりにこのようにすることができれば、よくならないでしょうか。
 
 ```rust,ignore
 foo.bar().baz();
 ```
 
-Luckily, as you may have guessed with the leading question, you can! Rust provides
-the ability to use this ‘method call syntax’ via the `impl` keyword.
+幸運なことに、先程の質問からあなたが推測したとおり、あなたはできます！　
+Rustはこの「メソッド呼出構文」を`impl`キーワードを通じて使う能力を提供します。
 
-# Method calls
+# メソッド呼出し
 
-Here’s how it works:
+これはそれがどのように動くのかということです。
 
 ```rust
 struct Circle {
@@ -41,25 +41,19 @@ fn main() {
 }
 ```
 
-This will print `12.566371`.
+これは`12.566371`をプリントするでしょう。
 
+私たちは円を表現する`struct`を作りました。
+それから、私たちは`impl`ブロックを書き、その内側でメソッド、`area`を定義します。
 
+メソッドは特別な最初の引数を受け取ります。そしてそれには3つの種類があります。その種類とは`self`、`&self`、`&mut self`です。
+あなたはこの最初の引数を`foo.bar()`の中の`foo`として考えることができます。
+3つのバリアントは`foo`がなることのできる3つの種類のものと対応します。つまり、それがスタック上のただの値のときは`seif`、それが参照のときは`&self`、それがミュータブルな参照のときは`&mut self`に対応するということです。
+私たちは`&self`を`area`の引数として受け取ったので、それを他の引数とちょうど同じように使うことができます。
+私たちはそれが`Circle`であることを知っているので、私たちが他の`struct`について行うのとちょうど同じように`radius`にアクセスすることができます。
 
-We’ve made a `struct` that represents a circle. We then write an `impl` block,
-and inside it, define a method, `area`.
-
-Methods take a special first parameter, of which there are three variants:
-`self`, `&self`, and `&mut self`. You can think of this first parameter as
-being the `foo` in `foo.bar()`. The three variants correspond to the three
-kinds of things `foo` could be: `self` if it’s just a value on the stack,
-`&self` if it’s a reference, and `&mut self` if it’s a mutable reference.
-Because we took the `&self` parameter to `area`, we can use it just like any
-other parameter. Because we know it’s a `Circle`, we can access the `radius`
-just like we would with any other `struct`. 
-
-We should default to using `&self`, as you should prefer borrowing over taking
-ownership, as well as taking immutable references over mutable ones. Here’s an
-example of all three variants:
+あなたが所有権の移転よりもボローイングを、ミュータブルな参照よりもイミュータブルな参照を選ぶべきであるのと同様に、私たちは`&self`の使用をデフォルトとすべきです。
+これが3つの種類全ての例です。
 
 ```rust
 struct Circle {
@@ -83,11 +77,12 @@ impl Circle {
 }
 ```
 
-# Chaining method calls
+# メソッド呼出しの連鎖
 
-So, now we know how to call a method, such as `foo.bar()`. But what about our
-original example, `foo.bar().baz()`? This is called ‘method chaining’. Let’s
-look at an example:
+さて、今私たちは`foo.bar()`のようなメソッドの呼出方法を知りました。
+しかし、私たちの元の例、`foo.bar().baz()`についてはどうでしょうか。
+これは「メソッド連鎖」と呼ばれます。
+例を見ましょう。
 
 ```rust
 struct Circle {
@@ -115,7 +110,7 @@ fn main() {
 }
 ```
 
-Check the return type:
+戻り値の型をチェックしましょう。
 
 ```rust
 # struct Circle;
@@ -124,13 +119,13 @@ fn grow(&self, increment: f64) -> Circle {
 # Circle } }
 ```
 
-We just say we’re returning a `Circle`. With this method, we can grow a new
-`Circle` to any arbitrary size.
+私たちは単に私たちが`Circle`を戻すことを表します。
+このメソッドを使って、私たちは新しい`Circle`を任意のサイズに大きくすることができます。
 
-# Associated functions
+# 随伴関数
 
-You can also define associated functions that do not take a `self` parameter.
-Here’s a pattern that’s very common in Rust code:
+あなたは`self`引数を受け取らない随伴関数を定義することもできます。
+これはRustのコードでは非常に一般的なパターンです。
 
 ```rust
 struct Circle {
@@ -154,18 +149,17 @@ fn main() {
 }
 ```
 
-This ‘associated function’ builds a new `Circle` for us. Note that associated
-functions are called with the `Struct::function()` syntax, rather than the
-`ref.method()` syntax. Some other languages call associated functions ‘static
-methods’.
+この「随伴関数」は新しい`Circle`を私たちのために作ります。
+随伴関数は`ref.method()`構文ではなく`Struct::function()`構文で呼び出されるということに注意しましょう。
+いくつかの他の言語は随伴関数を「スタティックメソッド」と呼びます。
 
-# Builder Pattern
+# ビルダーパターン
 
-Let’s say that we want our users to be able to create `Circle`s, but we will
-allow them to only set the properties they care about. Otherwise, the `x`
-and `y` attributes will be `0.0`, and the `radius` will be `1.0`. Rust doesn’t
-have method overloading, named arguments, or variable arguments. We employ
-the builder pattern instead. It looks like this:
+私たちが私たちのユーザーを`Circle`を作ることができるようにしたいことを表現しましょう。ただし、私たちは彼らに彼らが関心を持つプロパティーだけをセットできるようにするでしょう。
+そうしない場合は`x`属性と`y`属性は`0.0`になり、`radius`は`1.0`になるでしょう。
+Rustにはメソッドオーバーロード、名前付引数、可変長引数はありません。
+私たちはビルダーパターンを代わりに用います。
+それはこのように見えます。
 
 ```rust
 struct Circle {
@@ -224,9 +218,8 @@ fn main() {
 }
 ```
 
-What we’ve done here is make another `struct`, `CircleBuilder`. We’ve defined our
-builder methods on it. We’ve also defined our `area()` method on `Circle`. We
-also made one more method on `CircleBuilder`: `finalize()`. This method creates
-our final `Circle` from the builder. Now, we’ve used the type system to enforce
-our concerns: we can use the methods on `CircleBuilder` to constrain making
-`Circle`s in any way we choose.
+私たちがここでしたことはもう1つの`struct`、`CircleBuilder`の作成です。
+私たちは私たちのビルダーメソッドをその中に定義しています。
+私たちは`Circle`の中に私たちの`area()`メソッドも定義しています。
+私たちは`CircleBuilder`にさらにもう1つのメソッド、`finalize()`も定義しています。
+今、私たちは型システムを私たちの関心事を実施するために使っています。つまり、私たちは`CircleBuilder`内のメソッドを私たちの選んだ方法で`Circle`を作ることを強制するために使うことができるということです。
